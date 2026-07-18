@@ -7,6 +7,18 @@ const submitButton = document.getElementById("submitButton");
 const dashboard = document.getElementById("dashboard");
 const taskCount = document.getElementById("taskCount");
 const taskList = document.getElementById("taskList");
+const managerDropdown = document.getElementById("manager");
+
+// Manager List
+const managers = ["Rahul", "Priya", "Arun"];
+
+// Fill the dropdown with managers
+managers.forEach(manager => {
+    const option = document.createElement("option");
+    option.value = manager;
+    option.textContent = manager;
+    managerDropdown.appendChild(option);
+})
 
 
 // ===========================
@@ -78,6 +90,12 @@ function parseTasks(text) {
 parseButton.addEventListener("click", function () {
 
     const pastedText = dashboard.value;
+
+    //Manager Validation
+    if (managerDropdown.value === "") {
+        alert("Please select your manager.");
+        return;
+    }
 
     if (pastedText.trim() === "") {
         alert("Please paste your MM dashboard first.");
@@ -178,3 +196,6 @@ submitButton.addEventListener("click", function (){
     alert("Submit feature coming soon!");
 
 });
+
+
+
