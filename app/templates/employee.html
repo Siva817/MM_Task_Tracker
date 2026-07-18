@@ -11,10 +11,10 @@
     <h3>Employee Submission</h3>
 
     <p>Employee ID</p>
-    <input type="text" id="employee_id">
+    <input type="text" id="employeeId">
 
     <p>Employee Name</p>
-    <input type="text" id="empname">
+    <input type="text" id="employeeName">
 
     <p>Manager</p>
     <select id="manager">
@@ -66,6 +66,41 @@
     </table>
 
     <br>
+
+    <h3>Idle (Not Working on any task)</h3>
+    <label>
+        <input
+        type = "radio"
+        name = "currentTask"
+        value = "idle"
+        id = "idleRadio">
+        Idle
+    </label>
+
+    <div id = "idleSection">
+        <p>Drive Folder Link</p>
+        <input 
+        type = "text"
+        id = "driveLink"
+        placeholder = "Paste Drive File or Folder Link here..."
+        size = "80">
+
+        <br><br>
+
+        <p>Remarks</p>
+        <textarea
+            id = "idleRemarks"
+            rows = "3"
+            cols = "80"
+            placeholder = "Reason for being idle (optional)"
+        ></textarea>
+
+    </div>
+
+    
+
+    <br><br>
+
 
     <button id="submitButton">
         Submit

@@ -8,6 +8,8 @@ const dashboard = document.getElementById("dashboard");
 const taskCount = document.getElementById("taskCount");
 const taskList = document.getElementById("taskList");
 const managerDropdown = document.getElementById("manager");
+const idleRadio = document.getElementById("idleRadio");
+const idleSection = document.getElementById("idleSection");
 
 // Manager List
 const managers = ["Rahul", "Priya", "Arun"];
@@ -90,6 +92,16 @@ function parseTasks(text) {
 
 }
 
+function updateIdleSection() {
+
+    if (idleRadio.checked) {
+        idleSection.style.display = "block";
+    } else {
+        idleSection.style.display = "none";
+    }
+    console.log("Display:", idleSection.style.display);
+    console.log(idleSection);
+}
 
 // ===========================
 // Parse Button Click
@@ -99,11 +111,7 @@ parseButton.addEventListener("click", function () {
 
     const pastedText = dashboard.value;
 
-    //Manager Validation
-    if (managerDropdown.value === "") {
-        alert("Please select your manager.");
-        return;
-    }
+    
 
     if (pastedText.trim() === "") {
         alert("Please paste your MM dashboard first.");
@@ -199,9 +207,26 @@ parseButton.addEventListener("click", function () {
 });
 
 submitButton.addEventListener("click", function (){
+
+    //Manager Validation
+    if (managerDropdown.value === "") {
+        alert("Please select your manager.");
+        return;
+    }
+
     alert("Submit feature coming soon!");
 
 });
 
 
+// Hide idle section on page load
+updateIdleSection();
 
+// Listen for all currentTask radio changes
+document.addEventListener("change", function (event) {
+
+    if (event.target.name === "currentTask") {
+        updateIdleSection();
+    }
+
+});
