@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MM Task Tracker</title>
+
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+    <h1>MM Task Tracker</h1>
+    <h3>Employee Submission</h3>
+
+    <p>Employee ID</p>
+    <input type="text" id="employee_id">
+
+    <p>Employee Name</p>
+    <input type="text" id="empname">
+
+    <p>Manager</p>
+    <input type="text" id="manager">
+
+    <p>Paste MM Dashboard</p>
+
+    <textarea
+        id = "dashboard"
+        rows = "18"
+        cols = "100"
+        placeholder = "Paste MM Dashboard here..."
+    ></textarea>
+
+    <br><br>
+
+    <button id="parseButton">Parse Tasks</button>
+
+    <h3 id="taskCount"></h3>
+
+    <table border="1" cellpadding="6" cellspacing="0">
+
+        <thead>
+
+            <tr>
+
+                <th>Current</th>
+
+                <th>Task</th>
+
+                <th>SWAY</th>
+
+                <th>MM</th>
+
+                <th>Jobs</th>
+
+                <th>Remarks</th>
+
+            </tr>
+
+        </thead>
+
+        <tbody id="taskList">
+
+        </tbody>
+
+    </table>
+
+    <br>
+
+    <button id="submitButton">
+        Submit
+    </button>
+
+    <script src="/static/script.js"></script>
+
+</body>
+</html>
