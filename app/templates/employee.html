@@ -3,109 +3,102 @@
 <head>
     <title>MM Task Tracker</title>
 
+    <!-- External stylesheet for styling -->
     <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
 
+    <!-- Page Header -->
     <h1>MM Task Tracker</h1>
     <h3>Employee Submission</h3>
 
+    <!-- Employee ID Input -->
     <p>Employee ID</p>
     <input type="text" id="employeeId">
 
+    <!-- Employee Name Input -->
     <p>Employee Name</p>
     <input type="text" id="employeeName">
 
+    <!-- Manager Dropdown (populated dynamically via JS) -->
     <p>Manager</p>
     <select id="manager">
         <option value="">Select Manager</option>
     </select>
 
-
+    <!-- Dashboard Paste Area -->
     <p>Paste MM Dashboard</p>
-
     <textarea
-        id = "dashboard"
-        rows = "18"
-        cols = "100"
-        placeholder = "Paste MM Dashboard here..."
+        id="dashboard"
+        rows="18"
+        cols="100"
+        placeholder="Paste MM Dashboard here..."
     ></textarea>
 
     <br><br>
 
+    <!-- Parse Button -->
     <button id="parseButton">Parse Tasks</button>
 
+    <!-- Task Count Display -->
     <h3 id="taskCount"></h3>
 
+    <!-- Task Table -->
     <table border="1" cellpadding="6" cellspacing="0">
-
         <thead>
-
             <tr>
-
                 <th>Current</th>
-
                 <th>Task</th>
-
                 <th>SWAY</th>
-
                 <th>MM</th>
-
                 <th>Jobs</th>
-
                 <th>Remarks</th>
-
             </tr>
-
         </thead>
-
         <tbody id="taskList">
-
+            <!-- Task rows will be injected here dynamically -->
         </tbody>
-
     </table>
 
     <br>
 
+    <!-- Idle Section -->
     <h3>Idle (Not Working on any task)</h3>
     <label>
         <input
-        type = "radio"
-        name = "currentTask"
-        value = "idle"
-        id = "idleRadio">
+            type="radio"
+            name="currentTask"
+            value="idle"
+            id="idleRadio">
         Idle
     </label>
 
-    <div id = "idleSection">
+    <!-- Hidden Idle Section (shown when Idle is selected) -->
+    <div id="idleSection">
         <p>Drive Folder Link</p>
         <input 
-        type = "text"
-        id = "driveLink"
-        placeholder = "Paste Drive File or Folder Link here..."
-        size = "80">
+            type="text"
+            id="driveLink"
+            placeholder="Paste Drive File or Folder Link here..."
+            size="80">
 
         <br><br>
 
         <p>Remarks</p>
         <textarea
-            id = "idleRemarks"
-            rows = "3"
-            cols = "80"
-            placeholder = "Reason for being idle (optional)"
+            id="idleRemarks"
+            rows="3"
+            cols="80"
+            placeholder="Reason for being idle (optional)"
         ></textarea>
-
     </div>
-
-    
 
     <br><br>
 
+    <!-- Submit Button -->
+    <button id="submitButton">Submit</button>
 
-    <button id="submitButton">
-        Submit
-    </button>
-
+    <!-- External JavaScript file -->
     <script src="/static/script.js"></script>
 
 </body>

@@ -14,12 +14,16 @@ def employee_home():
     }
 
 @router.post("/submit")
-def submit_employee(submission: EmployeeSubmission):
-    print(submission)
+async def submit_employee(request: Request):
+
+    data = await request.json()
+
+    print("\n====== Employee Submission ===")
+    print(data)
+    print("====== End Employee Submission ===\n")
 
     return {
-        "status": "success",
-        "message": "Submission received!"
+        "message": "Data received successfully"
     }
 
 @router.get("/page", response_class=HTMLResponse)
