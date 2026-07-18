@@ -67,7 +67,15 @@ function parseTasks(text) {
             continue;
         }
 
-        const taskName = lines[i - 1].trim();
+        let j = i - 1;
+        while (j >=0 && lines[j].trim() === "") {
+            j--;
+        }
+
+        const taskName = lines[j].trim();
+
+        
+
 
         tasks.push({
             name: taskName,
@@ -103,8 +111,6 @@ parseButton.addEventListener("click", function () {
     }
 
     const tasks = parseTasks(pastedText);
-
-    console.log(tasks);
 
     taskCount.innerText = `${tasks.length} Tasks Found`;
 
