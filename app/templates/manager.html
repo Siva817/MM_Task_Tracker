@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Manager Dashboard</title>
+</head>
+
+<body>
+
+    <h1>Manager Dashboard</h1>
+
+    <label for="managerFilter"><b>Manager</b></label>
+
+    <select id="managerFilter">
+
+        <option value="All">All</option>
+
+        {% for manager in managers %}
+
+        <option value="{{ manager }}">
+            {{ manager }}
+        </option>
+
+        {% endfor %}
+
+    </select>
+
+    <br><br>
+
+    <table border="1" cellpadding="6" cellspacing="0">
+
+        <thead>
+
+            <tr>
+
+                <th>Employee</th>
+                <th>Manager</th>
+                <th>Current Task</th>
+                <th>Submitted At</th>
+
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+            {% for submission in submissions %}
+
+            <tr>
+
+                <td>{{ submission.employee_name }}</td>
+                <td>{{ submission.manager }}</td>
+                <td>{{ submission.current_task }}</td>
+                <td>{{ submission.submitted_at }}</td>
+
+            </tr>
+
+            {% endfor %}
+
+        </tbody>
+
+    </table>
+
+</body>
+
+</html>

@@ -1,5 +1,6 @@
 # Import the function that provides a database connection
 from app.db.database import get_connection
+from app.data.managers import MANAGERS
 
 def initialize_database():
     """
@@ -42,6 +43,24 @@ def initialize_database():
             FOREIGN KEY (submission_id) REFERENCES submissions(id)
         )
     """)
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS managers (
+
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+            name TEXT NOT NULL UNIQUE
+
+        )
+    """)
+
+    cursor.executemany(
+        """
+        INSERT OR IGNORE INTO managers(name)
+        VALUES (?)
+        """,
+        [(manager,) for manager in MANAGERS]
+    )
 
     # Commit changes to the database
     connection.commit()

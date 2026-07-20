@@ -2,6 +2,8 @@
 from fastapi import FastAPI
 # Import employee router for modular route handling
 from app.routes.employee import router as employee_router
+# Import manager router
+from app.routes.manager import router as manager_router
 # Import Jinja2Templates for rendering HTML templates
 from fastapi.templating import Jinja2Templates
 # Import StaticFiles for serving static assets (CSS, JS, images)
@@ -25,6 +27,12 @@ app.include_router(
     employee_router,
     prefix="/employee",   # All employee routes will start with /employee
     tags=["Employee"]     # Tag used for API documentation grouping
+)
+
+app.include_router(
+    manager_router,
+    prefix="/manager",
+    tags=["Manager"]
 )
 
 @app.get("/")

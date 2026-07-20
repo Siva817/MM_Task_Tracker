@@ -22,16 +22,36 @@ const idleSection = document.getElementById("idleSection");
 // Manager List Setup
 // ===========================
 
-// Predefined list of managers
-const managers = ["Rahul", "Priya", "Arun"];
 
 // Populate dropdown with manager names
-managers.forEach(manager => {
-    const option = document.createElement("option");
-    option.value = manager;
-    option.textContent = manager;
-    managerDropdown.appendChild(option);
-});
+async function loadManagers() {
+
+    try {
+
+        const response = await fetch("/employee/managers");
+
+        const managers = await response.json();
+
+        managers.forEach(manager => {
+
+            const option = document.createElement("option");
+
+            option.value = manager;
+            option.textContent = manager;
+
+            managerDropdown.appendChild(option);
+
+        });
+
+    } catch (error) {
+
+        console.error("Failed to load managers:", error);
+
+        alert("Unable to load manager list.");
+
+    }
+
+}
 
 // ===========================
 // Utility: Check if a line is a Task ID
@@ -219,3 +239,5 @@ document.addEventListener("change", function (event) {
         updateIdleSection();
     }
 });
+
+loadManagers();

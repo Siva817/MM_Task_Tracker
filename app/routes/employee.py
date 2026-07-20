@@ -8,6 +8,8 @@ from app.models.employee import EmployeeSubmission
 # Import service function to save submissions into the database
 from app.services.submission_service import save_submission
 
+from app.services.manager import get_managers
+
 # Create a router instance for employee-related endpoints
 router = APIRouter()
 
@@ -59,3 +61,8 @@ def employee_page(request: Request):
         name="employee.html",
         context={}
     )
+
+@router.get("/managers")
+async def managers():
+
+    return get_managers()
