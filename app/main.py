@@ -8,7 +8,11 @@ from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 
 # Initialize FastAPI application instance
-app = FastAPI()
+app = FastAPI(
+    title="MM Task Tracker",
+    description="A FastAPI application to track employee tasks and events.",
+    version="1.0.0"
+)
 
 # Configure Jinja2 templates directory
 templates = Jinja2Templates(directory="app/templates")

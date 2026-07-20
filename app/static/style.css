@@ -1,3 +1,4 @@
+/* Hide the idle section by default */
 #idleSection {
     display: none;
 }

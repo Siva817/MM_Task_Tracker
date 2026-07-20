@@ -1,48 +1,40 @@
 # MM Task Tracker
 
-## Overview
-
-MM Task Tracker is a FastAPI-based web application that allows employees to submit their current MM task status and enables managers to consolidate team information.
-
-The application helps capture:
-
-* Employee details
-* Manager name
-* Current working task
-* SWAY assessment status
-* MM assessment status
-* Job availability
-* Remarks
-* Idle status with Drive folder link and remarks
+A FastAPI-based web application for tracking employee task status, idle events, and task-related information. Employee submissions are stored in a SQLite database and can later be viewed through a manager dashboard.
 
 ---
 
-## Current Features
+## Features
 
-### Employee Page
+### Employee Portal
 
-* Enter Employee ID and Employee Name
-* Select Manager from a dropdown
-* Paste MM Dashboard
-* Automatically parse available tasks
-* Select the current task
-* Mark:
+* Submit employee ID and employee name
+* Select manager
+* Paste MM Dashboard and automatically parse tasks
+* Select the current working task
+* Mark SWAY and MM clearance status
+* Record job availability
+* Add task remarks
+* Submit Idle events with:
 
-  * SWAY Cleared
-  * MM Cleared
-  * Jobs Available / Jobs Not Available / Error
-* Add remarks for each task
-* Select **Idle** when not working
-* Add Drive folder link and idle remarks
-* Submit data to the FastAPI backend
+  * Drive file/folder link
+  * Idle remarks
+
+### Backend
+
+* FastAPI REST API
+* SQLite database
+* Stores employee submissions
+* Stores parsed tasks linked to each submission
+* Automatic submission timestamp
 
 ---
 
-## Technology Stack
+## Tech Stack
 
-* Python 3.12+
+* Python 3
 * FastAPI
-* Uvicorn
+* SQLite
 * HTML
 * CSS
 * JavaScript
@@ -57,24 +49,19 @@ MM_Task_Tracker/
 ├── app/
 │   ├── main.py
 │   ├── db/
+│   │   ├── database.py
+│   │   ├── init_db.py
+│   │   └── tracker.db
 │   ├── models/
-│   │   ├── employee.py
-│   │   └── enum.py
 │   ├── routes/
-│   │   ├── employee.py
-│   │   └── manager.py
 │   ├── services/
 │   ├── static/
-│   │   ├── script.js
-│   │   └── style.css
 │   └── templates/
-│       └── employee.html
 │
 ├── docs/
 ├── tests/
 ├── requirements.txt
-├── README.md
-└── .gitignore
+└── README.md
 ```
 
 ---
@@ -84,41 +71,28 @@ MM_Task_Tracker/
 Clone the repository:
 
 ```bash
-git clone https://github.com/Siva817/MM_Task_Tracker.git
-```
-
-Move into the project folder:
-
-```bash
+git clone <repository-url>
 cd MM_Task_Tracker
 ```
 
 Create a virtual environment:
 
-### Windows
-
 ```bash
 python -m venv .venv
 ```
 
-Activate it:
+Activate the virtual environment:
 
-### Command Prompt
+### Windows
 
 ```bash
 .venv\Scripts\activate
 ```
 
-### PowerShell
-
-```powershell
-.venv\Scripts\Activate.ps1
-```
-
-### Git Bash
+### Linux / macOS
 
 ```bash
-source .venv/Scripts/activate
+source .venv/bin/activate
 ```
 
 Install dependencies:
@@ -129,38 +103,68 @@ pip install -r requirements.txt
 
 ---
 
-## Running the Application
+## Initialize the Database
 
-Start the FastAPI server:
+Run:
+
+```bash
+python -m app.db.init_db
+```
+
+This creates the SQLite database and required tables.
+
+---
+
+## Run the Application
+
+Start the development server:
 
 ```bash
 uvicorn app.main:app --reload
 ```
 
-Open the application in your browser:
+Open your browser:
 
 ```
-http://127.0.0.1:8000/employee/page
+http://127.0.0.1:8000
 ```
 
 ---
 
-## Development Workflow
+## API Documentation
 
-After making changes:
+FastAPI automatically generates interactive API documentation.
 
-```bash
-git status
-git add .
-git commit -m "Describe your changes"
-git push
+Swagger UI:
+
+```
+http://127.0.0.1:8000/docs
 ```
 
-To get the latest updates from GitHub:
+ReDoc:
 
-```bash
-git pull
 ```
+http://127.0.0.1:8000/redoc
+```
+
+Application metadata:
+
+* **Title:** MM Task Tracker
+* **Description:** A FastAPI application to track employee tasks and events.
+* **Version:** 1.0.0
+
+---
+
+## Database
+
+SQLite is used as the local database.
+
+Current tables:
+
+* `submissions`
+* `tasks`
+
+Each submission can contain multiple tasks through a foreign key relationship.
 
 ---
 
@@ -169,21 +173,18 @@ git pull
 Completed:
 
 * Employee submission page
-* MM dashboard parser
-* Manager dropdown
+* MM Dashboard task parser
 * Idle workflow
-* Frontend to backend communication
-* JSON submission to FastAPI
+* SQLite persistence
+* Task storage
+* Timestamp recording
 
 Planned:
 
-* SQLite database
 * Manager dashboard
-* Data consolidation
-* Employee history
+* Submission history
+* Search and filtering
 * Reports and analytics
-
----
 
 ## Author
 
