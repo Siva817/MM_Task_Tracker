@@ -55,41 +55,91 @@ def get_managers():
     return [row["name"] for row in rows]
 
 
-def get_latest_submissions(selected_date=None):
+def get_latest_submissions(selected_date=None, manager=None):
     connection = get_connection()
     cursor = connection.cursor()
 
-    if selected_date:
-        cursor.execute("""
-            SELECT s.*
-            FROM submissions s
-            INNER JOIN (
-                SELECT employee_id, MAX(submitted_at) AS latest_time
-                FROM submissions
-                WHERE DATE(submitted_at) = ?
-                GROUP BY employee_id
-            ) latest
-            ON s.employee_id = latest.employee_id
-            AND s.submitted_at = latest.latest_time
-            ORDER BY s.employee_name
-        """, (selected_date,))
+    conditions = []
+    params = []
 
-    else:
-        cursor.execute("""
-            SELECT s.*
-            FROM submissions s
-            INNER JOIN (
-                SELECT employee_id, MAX(submitted_at) AS latest_time
-                FROM submissions
-                GROUP BY employee_id
-            ) latest
-            ON s.employee_id = latest.employee_id
-            AND s.submitted_at = latest.latest_time
-            ORDER BY s.employee_name
-        """)
+    if selected_date:
+        conditions.append("DATE(submitted_at) = ?")
+        params.append(selected_date)
+
+    if manager and manager != "All":
+        conditions.append("manager = ?")
+        params.append(manager)
+
+    where_clause = ""
+
+    if conditions:
+        where_clause = "WHERE " + " AND ".join(conditions)
+
+    cursor.execute(f"""
+        SELECT *
+        FROM submissions
+        WHERE id IN (
+            SELECT MAX(id)
+            FROM submissions
+            {where_clause}
+            GROUP BY employee_id
+        )
+        ORDER BY employee_name
+    """, params)
 
     rows = cursor.fetchall()
 
     connection.close()
 
     return rows
+
+def get_employee_status_counts(selected_date=None, manager=None):
+    connection = get_connection()
+    cursor = connection.cursor()
+
+    if selected_date:
+        date_filter = "WHERE DATE(submitted_at) = ?"
+        params = [selected_date]
+    else:
+        date_filter = ""
+        params = []
+
+    # Get latest submission for each employee
+    query = f"""
+        SELECT *
+        FROM submissions
+        WHERE id IN (
+            SELECT MAX(id)
+            FROM submissions
+            {date_filter}
+            GROUP BY employee_id
+        )
+    """
+
+    cursor.execute(query, params)
+
+    rows = cursor.fetchall()
+
+    # Apply manager filter
+    if manager and manager != "All":
+        rows = [
+            row for row in rows
+            if row["manager"] == manager
+        ]
+
+    total = len(rows)
+
+    idle = sum(
+        1 for row in rows
+        if row["idle"] == 1
+    )
+
+    production = total - idle
+
+    connection.close()
+
+    return {
+        "total": total,
+        "idle": idle,
+        "production": production
+    }

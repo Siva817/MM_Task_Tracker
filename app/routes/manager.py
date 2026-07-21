@@ -4,7 +4,8 @@ from fastapi.templating import Jinja2Templates
 from app.services.manager import (
     get_all_submissions,
     get_latest_submissions,
-    get_managers)
+    get_managers,
+    get_employee_status_counts)
 
 router = APIRouter()
 
@@ -13,16 +14,23 @@ templates = Jinja2Templates(directory="app/templates")
 @router.get("", response_class=HTMLResponse)
 async def manager_page(
     request: Request,
-    selected_date: str | None = None
+    selected_date: str | None = None,
+    selected_manager: str | None = None
 ):
 
     submissions = get_all_submissions()
 
     latest_submissions = get_latest_submissions(
-        selected_date
+        selected_date,
+        selected_manager
     )
 
     managers = get_managers()
+
+    status_counts = get_employee_status_counts(
+        selected_date,
+        selected_manager
+    )
 
     return templates.TemplateResponse(
         request,
@@ -32,6 +40,8 @@ async def manager_page(
             "submissions": submissions,
             "latest_submissions": latest_submissions,
             "managers": managers,
-            "selected_date": selected_date
+            "status_counts": status_counts,
+            "selected_date": selected_date,
+            "selected_manager": selected_manager
         }
     )

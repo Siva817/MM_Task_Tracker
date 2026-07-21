@@ -11,15 +11,42 @@
 
     <h1>Manager Dashboard</h1>
 
+    <div class="dashboard-summary">
+
+        <div class="summary-card">
+            <h3>Idle</h3>
+            <p>{{ status_counts.idle }}</p>
+        </div>
+
+        <div class="summary-card">
+            <h3>Production</h3>
+            <p>{{ status_counts.production }}</p>
+        </div>
+
+        <div class="summary-card">
+            <h3>Total Employees</h3>
+            <p>{{ status_counts.total }}</p>
+        </div>
+
+    </div>
+
     <label for="managerFilter"><b>Manager</b></label>
 
     <select id="managerFilter">
 
-        <option value="All">All</option>
+        <option value="All"
+            {% if selected_manager == "All" or not selected_manager %}
+                selected
+            {% endif %}>
+            All
+        </option>
 
         {% for manager in managers %}
 
-        <option value="{{ manager }}">
+        <option value="{{ manager }}"
+            {% if selected_manager == manager %}
+                selected
+            {% endif %}>
             {{ manager }}
         </option>
 
@@ -101,21 +128,25 @@
         managerFilter.addEventListener("change", function () {
 
             const selectedManager = managerFilter.value;
+            const selectedDate = dateFilter.value;
 
-            employeeRows.forEach(function (row) {
+            const params = new URLSearchParams();
 
-                const rowManager = row.dataset.manager;
+            if (selectedManager !== "All") {
+                params.append("selected_manager", selectedManager);
+            }
 
-                if (
-                    selectedManager === "All" ||
-                    rowManager === selectedManager
-                ) {
-                    row.style.display = "";
-                } else {
-                    row.style.display = "none";
-                }
+            if (selectedDate !== "") {
+                params.append("selected_date", selectedDate);
+            }
 
-            });
+            const queryString = params.toString();
+
+            if (queryString) {
+                window.location.href = "/manager?" + queryString;
+            } else {
+                window.location.href = "/manager";
+            }
 
         });
     </script>
