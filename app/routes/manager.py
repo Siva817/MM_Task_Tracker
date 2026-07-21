@@ -1,7 +1,10 @@
 from fastapi import APIRouter, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
-from app.services.manager import (get_all_submissions, get_managers)
+from app.services.manager import (
+    get_all_submissions,
+    get_latest_submissions,
+    get_managers)
 
 router = APIRouter()
 
@@ -12,6 +15,7 @@ templates = Jinja2Templates(directory="app/templates")
 async def manager_page(request: Request):
 
     submissions = get_all_submissions()
+    latest_submissions = get_latest_submissions()
     managers = get_managers()
 
     print("\n===== Manager Dashboard Data =====")
@@ -24,6 +28,7 @@ async def manager_page(request: Request):
         {
             "request": request,
             "submissions": submissions,
+            "latest_submissions": latest_submissions,
             "managers": managers
         }
     )

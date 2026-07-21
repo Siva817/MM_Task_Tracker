@@ -3,6 +3,8 @@
 
 <head>
     <title>Manager Dashboard</title>
+    <link rel="stylesheet" href="/static/style.css">
+
 </head>
 
 <body>
@@ -27,7 +29,7 @@
 
     <br><br>
 
-    <table border="1" cellpadding="6" cellspacing="0">
+    <table id="employeeTable" border="1" cellpadding="6" cellspacing="0">
 
         <thead>
 
@@ -44,9 +46,9 @@
 
         <tbody>
 
-            {% for submission in submissions %}
+            {% for submission in latest_submissions %}
 
-            <tr>
+            <tr data-manager="{{ submission.manager }}">
 
                 <td>{{ submission.employee_name }}</td>
                 <td>{{ submission.manager }}</td>
@@ -60,6 +62,32 @@
         </tbody>
 
     </table>
+
+    <script>
+        const managerFilter = document.getElementById("managerFilter");
+        const employeeRows = document.querySelectorAll("#employeeTable tbody tr");
+
+        managerFilter.addEventListener("change", function () {
+
+            const selectedManager = managerFilter.value;
+
+            employeeRows.forEach(function (row) {
+
+                const rowManager = row.dataset.manager;
+
+                if (
+                    selectedManager === "All" ||
+                    rowManager === selectedManager
+                ) {
+                    row.style.display = "";
+                } else {
+                    row.style.display = "none";
+                }
+
+            });
+
+        });
+    </script>
 
 </body>
 
