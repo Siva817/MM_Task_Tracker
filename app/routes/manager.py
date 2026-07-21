@@ -10,17 +10,19 @@ router = APIRouter()
 
 templates = Jinja2Templates(directory="app/templates")
 
-
 @router.get("", response_class=HTMLResponse)
-async def manager_page(request: Request):
+async def manager_page(
+    request: Request,
+    selected_date: str | None = None
+):
 
     submissions = get_all_submissions()
-    latest_submissions = get_latest_submissions()
-    managers = get_managers()
 
-    print("\n===== Manager Dashboard Data =====")
-    print(dict(submissions[0]))
-    print("===== End =====\n")
+    latest_submissions = get_latest_submissions(
+        selected_date
+    )
+
+    managers = get_managers()
 
     return templates.TemplateResponse(
         request,
@@ -29,7 +31,7 @@ async def manager_page(request: Request):
             "request": request,
             "submissions": submissions,
             "latest_submissions": latest_submissions,
-            "managers": managers
+            "managers": managers,
+            "selected_date": selected_date
         }
     )
-

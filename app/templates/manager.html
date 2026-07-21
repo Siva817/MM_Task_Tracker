@@ -27,6 +27,37 @@
 
     </select>
 
+    <label for="dateFilter"><b>Date</b></label>
+
+    <input
+        type="date"
+        id="dateFilter"
+        value="{{ selected_date or '' }}"
+    >
+
+    <script>
+
+        const dateFilter = document.getElementById("dateFilter");
+
+        dateFilter.addEventListener("change", function () {
+
+            const selectedDate = dateFilter.value;
+
+            if (selectedDate === "") {
+                window.location.href = "/manager";
+                return;
+            }
+
+            window.location.href =
+                "/manager?selected_date=" + selectedDate;
+
+        });
+
+    </script>
+
+
+
+
     <br><br>
 
     <table id="employeeTable" border="1" cellpadding="6" cellspacing="0">

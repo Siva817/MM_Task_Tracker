@@ -55,31 +55,41 @@ def get_managers():
     return [row["name"] for row in rows]
 
 
-def get_latest_submissions():
-    """
-    Retrieve the latest submission for each employee.
-
-    Returns:
-        list[dict]: A list of the most recent submissions per employee.
-    """
+def get_latest_submissions(selected_date=None):
     connection = get_connection()
     cursor = connection.cursor()
 
-    # Fetch the most recent submission for each employee
-    cursor.execute("""
-        SELECT s.*
-        FROM submissions s
-        INNER JOIN (
-            SELECT employee_id, MAX(submitted_at) AS latest_time
-            FROM submissions
-            GROUP BY employee_id
-        ) latest
-        ON s.employee_id = latest.employee_id
-        AND s.submitted_at = latest.latest_time
-        ORDER BY s.employee_name
-    """)
+    if selected_date:
+        cursor.execute("""
+            SELECT s.*
+            FROM submissions s
+            INNER JOIN (
+                SELECT employee_id, MAX(submitted_at) AS latest_time
+                FROM submissions
+                WHERE DATE(submitted_at) = ?
+                GROUP BY employee_id
+            ) latest
+            ON s.employee_id = latest.employee_id
+            AND s.submitted_at = latest.latest_time
+            ORDER BY s.employee_name
+        """, (selected_date,))
+
+    else:
+        cursor.execute("""
+            SELECT s.*
+            FROM submissions s
+            INNER JOIN (
+                SELECT employee_id, MAX(submitted_at) AS latest_time
+                FROM submissions
+                GROUP BY employee_id
+            ) latest
+            ON s.employee_id = latest.employee_id
+            AND s.submitted_at = latest.latest_time
+            ORDER BY s.employee_name
+        """)
 
     rows = cursor.fetchall()
+
     connection.close()
 
     return rows
