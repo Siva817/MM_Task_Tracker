@@ -1,260 +1,126 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manager Dashboard</title>
+
     <link rel="stylesheet" href="/static/style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 </head>
 
 <body>
-
     <h1>Manager Dashboard</h1>
 
-    <div class="dashboard-summary">
-
-        <div class="summary-card">
-            <h3>Idle</h3>
-            <p>{{ status_counts.idle }}</p>
+    <!-- ========================================
+         FILTERS
+    ========================================= -->
+    <section class="filters">
+        <div class="filter-group">
+            <label for="managerFilter"><b>Manager</b></label>
+            <select id="managerFilter">
+                <option value="All" {% if selected_manager == "All" or not selected_manager %}selected{% endif %}>All</option>
+                {% for manager in managers %}
+                <option value="{{ manager }}" {% if selected_manager == manager %}selected{% endif %}>{{ manager }}</option>
+                {% endfor %}
+            </select>
         </div>
 
-        <div class="summary-card">
-            <h3>Production</h3>
-            <p>{{ status_counts.production }}</p>
+        <div class="filter-group">
+            <label for="dateFilter"><b>Date</b></label>
+            <input type="date" id="dateFilter" value="{{ selected_date or '' }}">
+        </div>
+    </section>
+
+    <!-- ========================================
+         SUMMARY SECTION
+         CARDS LEFT + DOUGHNUT RIGHT
+    ========================================= -->
+    <section class="summary-section">
+        <!-- CARDS -->
+        <div class="dashboard-summary">
+            <div class="summary-card">
+                <h3>Idle</h3>
+                <p>{{ status_counts.idle }}</p>
+            </div>
+
+            <div class="summary-card">
+                <h3>Production</h3>
+                <p>{{ status_counts.production }}</p>
+            </div>
+
+            <div class="summary-card">
+                <h3>Total Employees</h3>
+                <p>{{ status_counts.total }}</p>
+            </div>
         </div>
 
-        <div class="summary-card">
-            <h3>Total Employees</h3>
-            <p>{{ status_counts.total }}</p>
+        <!-- DOUGHNUT -->
+        <div class="status-chart-container">
+            <canvas id="statusChart" aria-label="Employee status distribution chart"></canvas>
         </div>
+    </section>
 
-    </div>
+    <!-- ========================================
+         TASK VISIBILITY CHART
+    ========================================= -->
+    <section class="task-chart-container">
+        <canvas id="taskVisibilityChart" aria-label="Task visibility chart"></canvas>
+    </section>
 
-    <div style="width: 400px; height: 400px;">
-        <canvas id="statusChart"></canvas>
-    </div>
+    <!-- ========================================
+         TABLE TOGGLE BUTTON
+    ========================================= -->
+    <button id="toggleTableButton" type="button">Show Employee Table</button>
 
-    <br><br>
+    <!-- ========================================
+         EMPLOYEE TABLE
+    ========================================= -->
+    <section id="employeeTableContainer" class="employee-table-container hidden">
+        <table id="employeeTable">
+            <caption>Latest Employee Submissions</caption>
+            <thead>
+                <tr>
+                    <th>Employee</th>
+                    <th>Manager</th>
+                    <th>Current Task</th>
+                    <th>Submitted At</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for submission in latest_submissions %}
+                <tr data-manager="{{ submission.manager }}">
+                    <td>{{ submission.employee_name }}</td>
+                    <td>{{ submission.manager }}</td>
+                    <td>{{ submission.current_task }}</td>
+                    <td>{{ submission.submitted_at }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
 
-    <div style="width: 800px; height: 500px;">
-        <canvas id="taskVisibilityChart"></canvas>
-    </div>
-
-    <br><br>
-
-    <label for="managerFilter"><b>Manager</b></label>
-
-    <select id="managerFilter">
-
-        <option value="All"
-            {% if selected_manager == "All" or not selected_manager %}
-                selected
-            {% endif %}>
-            All
-        </option>
-
-        {% for manager in managers %}
-
-        <option value="{{ manager }}"
-            {% if selected_manager == manager %}
-                selected
-            {% endif %}>
-            {{ manager }}
-        </option>
-
-        {% endfor %}
-
-    </select>
-
-    <label for="dateFilter"><b>Date</b></label>
-
-    <input
-        type="date"
-        id="dateFilter"
-        value="{{ selected_date or '' }}"
-    >
-    
+    <!-- ========================================
+         DASHBOARD DATA
+    ========================================= -->
     <script>
-
-        const statusChart = document.getElementById("statusChart");
-
-        new Chart(statusChart, {
-            type: "doughnut",
-
-            data: {
-                labels: ["Idle", "Production"],
-
-                datasets: [{
-                    data: [
-                        {{ status_counts.idle }},
-                        {{ status_counts.production }}
-                    ]
-                }]
-            },
-
-            options: {
-                responsive: true,
-
-                plugins: {
-                    legend: {
-                        position: "bottom"
-                    },
-
-                    title: {
-                        display: true,
-                        text: "Idle vs Production"
-                    }
-                }
-            }
-        });
-
+        window.managerDashboardData = {
+            idle: {{ status_counts.idle }},
+            production: {{ status_counts.production }},
+            taskVisibility: [
+                {% for task in task_visibility %}
+                {
+                    taskId: "{{ task.task_id }}",
+                    employeeCount: {{ task.employee_count }}
+                }{% if not loop.last %},{% endif %}
+                {% endfor %}
+            ]
+        };
     </script>
 
-    <script>
-
-        const taskVisibilityChart =
-            document.getElementById("taskVisibilityChart");
-
-        new Chart(taskVisibilityChart, {
-            type: "bar",
-
-            data: {
-                labels: [
-                    {% for task in task_visibility %}
-                        "{{ task.task_id }}",
-                    {% endfor %}
-                ],
-
-                datasets: [{
-                    label: "Employees",
-                    data: [
-                        {% for task in task_visibility %}
-                            {{ task.employee_count }},
-                        {% endfor %}
-                    ]
-                }]
-            },
-
-            options: {
-                indexAxis: "y",
-
-                responsive: true,
-
-                plugins: {
-                    legend: {
-                        display: false
-                    },
-
-                    title: {
-                        display: true,
-                        text: "Task Visibility"
-                    }
-                },
-
-                scales: {
-                    x: {
-                        beginAtZero: true,
-
-                        ticks: {
-                            stepSize: 1
-                        }
-                    }
-                }
-            }
-        });
-
-    </script>
-
-    <script>
-
-        const dateFilter = document.getElementById("dateFilter");
-
-        dateFilter.addEventListener("change", function () {
-
-            const selectedDate = dateFilter.value;
-
-            if (selectedDate === "") {
-                window.location.href = "/manager";
-                return;
-            }
-
-            window.location.href =
-                "/manager?selected_date=" + selectedDate;
-
-        });
-
-    </script>
-
-
-
-
-    <br><br>
-
-    <table id="employeeTable" border="1" cellpadding="6" cellspacing="0">
-
-        <thead>
-
-            <tr>
-
-                <th>Employee</th>
-                <th>Manager</th>
-                <th>Current Task</th>
-                <th>Submitted At</th>
-
-            </tr>
-
-        </thead>
-
-        <tbody>
-
-            {% for submission in latest_submissions %}
-
-            <tr data-manager="{{ submission.manager }}">
-
-                <td>{{ submission.employee_name }}</td>
-                <td>{{ submission.manager }}</td>
-                <td>{{ submission.current_task }}</td>
-                <td>{{ submission.submitted_at }}</td>
-
-            </tr>
-
-            {% endfor %}
-
-        </tbody>
-
-    </table>
-
-    <script>
-        const managerFilter = document.getElementById("managerFilter");
-        const employeeRows = document.querySelectorAll("#employeeTable tbody tr");
-
-        managerFilter.addEventListener("change", function () {
-
-            const selectedManager = managerFilter.value;
-            const selectedDate = dateFilter.value;
-
-            const params = new URLSearchParams();
-
-            if (selectedManager !== "All") {
-                params.append("selected_manager", selectedManager);
-            }
-
-            if (selectedDate !== "") {
-                params.append("selected_date", selectedDate);
-            }
-
-            const queryString = params.toString();
-
-            if (queryString) {
-                window.location.href = "/manager?" + queryString;
-            } else {
-                window.location.href = "/manager";
-            }
-
-        });
-    </script>
-
+    <!-- ========================================
+         JAVASCRIPT
+    ========================================= -->
+    <script src="/static/manager.js"></script>
 </body>
-
 </html>
