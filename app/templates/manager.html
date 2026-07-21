@@ -4,6 +4,7 @@
 <head>
     <title>Manager Dashboard</title>
     <link rel="stylesheet" href="/static/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 </head>
 
@@ -28,6 +29,10 @@
             <p>{{ status_counts.total }}</p>
         </div>
 
+    </div>
+
+    <div style="width: 400px; height: 400px;">
+        <canvas id="statusChart"></canvas>
     </div>
 
     <label for="managerFilter"><b>Manager</b></label>
@@ -61,6 +66,45 @@
         id="dateFilter"
         value="{{ selected_date or '' }}"
     >
+    
+    <script>
+
+        const statusChart = document.getElementById("statusChart");
+
+        new Chart(statusChart, {
+            type: "doughnut",
+
+            data: {
+                labels: ["Idle", "Production"],
+
+                datasets: [{
+                    data: [
+                        {{ status_counts.idle }},
+                        {{ status_counts.production }}
+                    ]
+                }]
+            },
+
+            options: {
+                responsive: true,
+
+                plugins: {
+                    legend: {
+                        position: "bottom"
+                    },
+
+                    title: {
+                        display: true,
+                        text: "Idle vs Production"
+                    }
+                }
+            }
+        });
+
+    </script>
+
+
+
 
     <script>
 
