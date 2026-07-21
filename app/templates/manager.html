@@ -35,6 +35,14 @@
         <canvas id="statusChart"></canvas>
     </div>
 
+    <br><br>
+
+    <div style="width: 800px; height: 500px;">
+        <canvas id="taskVisibilityChart"></canvas>
+    </div>
+
+    <br><br>
+
     <label for="managerFilter"><b>Manager</b></label>
 
     <select id="managerFilter">
@@ -103,8 +111,60 @@
 
     </script>
 
+    <script>
 
+        const taskVisibilityChart =
+            document.getElementById("taskVisibilityChart");
 
+        new Chart(taskVisibilityChart, {
+            type: "bar",
+
+            data: {
+                labels: [
+                    {% for task in task_visibility %}
+                        "{{ task.task_id }}",
+                    {% endfor %}
+                ],
+
+                datasets: [{
+                    label: "Employees",
+                    data: [
+                        {% for task in task_visibility %}
+                            {{ task.employee_count }},
+                        {% endfor %}
+                    ]
+                }]
+            },
+
+            options: {
+                indexAxis: "y",
+
+                responsive: true,
+
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+
+                    title: {
+                        display: true,
+                        text: "Task Visibility"
+                    }
+                },
+
+                scales: {
+                    x: {
+                        beginAtZero: true,
+
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                }
+            }
+        });
+
+    </script>
 
     <script>
 

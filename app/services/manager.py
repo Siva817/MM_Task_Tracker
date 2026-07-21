@@ -143,3 +143,52 @@ def get_employee_status_counts(selected_date=None, manager=None):
         "idle": idle,
         "production": production
     }
+
+def get_task_visibility(selected_date=None, manager=None):
+    connection = get_connection()
+    cursor = connection.cursor()
+
+    conditions = []
+    params = []
+
+    if selected_date:
+        conditions.append("DATE(s.submitted_at) = ?")
+        params.append(selected_date)
+
+    if manager and manager != "All":
+        conditions.append("s.manager = ?")
+        params.append(manager)
+
+    where_clause = ""
+
+    if conditions:
+        where_clause = "WHERE " + " AND ".join(conditions)
+
+    cursor.execute(f"""
+        SELECT
+            t.task_id,
+            t.task_name,
+            COUNT(DISTINCT s.employee_id) AS employee_count
+        FROM tasks t
+        INNER JOIN submissions s
+            ON t.submission_id = s.id
+
+        INNER JOIN (
+            SELECT
+                employee_id,
+                MAX(id) AS latest_submission_id
+            FROM submissions s
+            {where_clause}
+            GROUP BY employee_id
+        ) latest
+            ON s.id = latest.latest_submission_id
+
+        GROUP BY t.task_id, t.task_name
+        ORDER BY employee_count DESC
+    """, params)
+
+    rows = cursor.fetchall()
+
+    connection.close()
+
+    return rows
