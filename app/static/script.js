@@ -168,6 +168,22 @@ parseButton.addEventListener("click", function () {
 // ===========================
 
 submitButton.addEventListener("click", async function () {
+
+    // Validate Employee ID
+    if (document.getElementById("employeeId").value.trim() === "") {
+        alert("Please enter Employee ID.");
+        document.getElementById("employeeId").focus();
+        return;
+    }
+
+    // Validate Employee Name
+    if (document.getElementById("employeeName").value.trim() === "") {
+        alert("Please enter Employee Name.");
+        document.getElementById("employeeName").focus();
+        return;
+    }
+
+
     // Validate manager selection
     if (managerDropdown.value === "") {
         alert("Please select your manager.");
