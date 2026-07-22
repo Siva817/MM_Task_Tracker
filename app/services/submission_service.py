@@ -32,8 +32,8 @@ def save_submission(data):
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         """,
         (
-            data["employeeId"],          # employee_id
-            data["employeeName"],        # employee_name
+            data["employeeId"].strip().lower(),          # employee_id
+            data["employeeName"].strip().lower(),        # employee_name
             data["manager"],             # manager
             data["currentTask"],         # current_task
             1 if data["idle"] else 0,    # idle (boolean → integer)
@@ -63,7 +63,7 @@ def save_submission(data):
             """,
             (
                 submission_id,                # Foreign key linking to submissions
-                task["id"],                   # task_id
+                task["id"].strip().lower(),                   # task_id
                 task["name"],                 # task_name
                 1 if task["sway"] else 0,     # sway (boolean → integer)
                 1 if task["mm"] else 0,       # mm (boolean → integer)

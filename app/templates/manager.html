@@ -90,7 +90,7 @@
             <tbody>
                 {% for submission in latest_submissions %}
                 <tr data-manager="{{ submission.manager }}">
-                    <td>{{ submission.employee_name }}</td>
+                    <td>{{ submission.employee_name.title() }}</td>
                     <td>{{ submission.manager }}</td>
                     <td>{{ submission.current_task }}</td>
                     <td>{{ submission.submitted_at }}</td>
@@ -99,6 +99,135 @@
             </tbody>
         </table>
     </section>
+
+    <!-- ===================================== -->
+    <!-- Task Visibility Lookup -->
+    <!-- ===================================== -->
+
+    <div id="taskLookupSection">
+
+        <h2>Task Visibility Lookup</h2>
+
+        <p>
+            Search for the latest visible tasks of an employee
+            or find employees who have a task visible.
+        </p>
+
+
+        <!-- Search Type -->
+
+        <label>
+            <input
+                type="radio"
+                name="lookupType"
+                value="employee"
+                checked
+            >
+
+            Employee ID
+        </label>
+
+
+        <label>
+            <input
+                type="radio"
+                name="lookupType"
+                value="task"
+            >
+
+            Task ID
+        </label>
+
+
+        <br><br>
+
+
+        <!-- Employee ID Input -->
+
+        <div id="employeeIdLookup">
+
+            <label for="lookupEmployeeId">
+                Employee ID
+            </label>
+
+            <input
+                type="text"
+                id="lookupEmployeeId"
+                placeholder="Enter Employee ID"
+            >
+
+        </div>
+
+
+        <!-- Task ID Input -->
+
+        <div
+            id="taskIdLookup"
+            style="display: none;"
+        >
+
+            <label for="lookupTaskId">
+                Task ID
+            </label>
+
+            <input
+                type="text"
+                id="lookupTaskId"
+                placeholder="Enter Task ID"
+            >
+
+        </div>
+
+
+        <br>
+
+        <button id="lookupFetchButton">
+            Fetch
+        </button>
+
+
+        <button
+            id="lookupClearButton"
+            type="button"
+        >
+            Clear
+        </button>
+
+
+        <br><br>
+
+
+        <!-- Lookup Results -->
+
+        <div
+            id="lookupResultsSection"
+            style="display: none;"
+        >
+
+            <h3 id="lookupResultsTitle"></h3>
+
+
+            <table
+                id="lookupResultsTable"
+                border="1"
+                cellpadding="6"
+                cellspacing="0"
+            >
+
+                <thead id="lookupResultsHead">
+
+                </thead>
+
+
+                <tbody id="lookupResultsBody">
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
 
     <!-- ========================================
          DASHBOARD DATA

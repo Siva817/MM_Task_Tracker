@@ -192,3 +192,122 @@ def get_task_visibility(selected_date=None, manager=None):
     connection.close()
 
     return rows
+
+
+def get_employees_with_visible_task(task_id, manager=None):
+
+    connection = get_connection()
+    cursor = connection.cursor()
+
+    query = """
+        SELECT
+            s.employee_id,
+            s.employee_name,
+            s.manager,
+            s.submitted_at AS last_log_time
+        FROM submissions s
+
+        INNER JOIN tasks t
+            ON t.submission_id = s.id
+
+        INNER JOIN (
+            SELECT
+                employee_id,
+                MAX(id) AS latest_submission_id
+            FROM submissions
+    """
+
+    params = []
+
+
+    if manager and manager != "All":
+
+        query += """
+            WHERE manager = ?
+        """
+
+        params.append(manager)
+
+
+    query += """
+            GROUP BY employee_id
+        ) latest
+
+        ON s.id = latest.latest_submission_id
+
+        WHERE LOWER(t.task_id) = LOWER(?)
+
+        ORDER BY s.employee_name
+    """
+
+    params.append(task_id)
+
+
+    cursor.execute(
+        query,
+        params
+    )
+
+    rows = cursor.fetchall()
+
+    connection.close()
+
+    return rows
+
+def get_employee_visible_tasks(employee_id, manager=None):
+
+    connection = get_connection()
+    cursor = connection.cursor()
+
+    query = """
+        SELECT
+            s.employee_id,
+            s.employee_name,
+            s.manager,
+            s.submitted_at,
+            t.task_id,
+            t.task_name,
+            t.jobs,
+            t.remarks
+        FROM submissions s
+
+        INNER JOIN tasks t
+            ON t.submission_id = s.id
+
+        INNER JOIN (
+            SELECT
+                employee_id,
+                MAX(id) AS latest_submission_id
+            FROM submissions
+            WHERE LOWER(employee_id) = LOWER(?)
+    """
+
+    params = [employee_id]
+
+    if manager and manager != "All":
+
+        query += """
+            AND manager = ?
+        """
+
+        params.append(manager)
+
+    query += """
+            GROUP BY employee_id
+        ) latest
+
+        ON s.id = latest.latest_submission_id
+
+        ORDER BY t.task_name
+    """
+
+    cursor.execute(
+        query,
+        params
+    )
+
+    rows = cursor.fetchall()
+
+    connection.close()
+
+    return rows

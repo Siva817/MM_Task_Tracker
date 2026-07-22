@@ -6,7 +6,9 @@ from app.services.manager import (
     get_latest_submissions,
     get_managers,
     get_employee_status_counts,
-    get_task_visibility)
+    get_task_visibility,
+    get_employee_visible_tasks,
+    get_employees_with_visible_task)
 
 router = APIRouter()
 
@@ -62,3 +64,54 @@ async def manager_page(
         }
     )
 
+@router.get("/lookup")
+async def manager_lookup(
+    lookup_type: str,
+    employee_id: str | None = None,
+    task_id: str | None = None,
+    selected_manager: str | None = None
+):
+
+    if lookup_type == "employee":
+
+        rows = get_employee_visible_tasks(
+            employee_id,
+            selected_manager
+        )
+
+        return [
+            {
+                "employee_id": row["employee_id"],
+                "employee_name": row["employee_name"],
+                "manager": row["manager"],
+                "submitted_at": row["submitted_at"],
+                "task_id": row["task_id"],
+                "task_name": row["task_name"],
+                "jobs": row["jobs"],
+                "remarks": row["remarks"]
+            }
+            for row in rows
+        ]
+
+
+    if lookup_type == "task":
+
+        rows = get_employees_with_visible_task(
+            task_id,
+            selected_manager
+        )
+
+        return [
+            {
+                "employee_id": row["employee_id"],
+                "employee_name": row["employee_name"],
+                "manager": row["manager"],
+                "last_log_time": row["last_log_time"]
+            }
+            for row in rows
+        ]
+
+
+    return {
+        "error": "Invalid lookup type"
+    }
