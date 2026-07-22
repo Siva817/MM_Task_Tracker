@@ -134,6 +134,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const lookupTaskId = document.getElementById("lookupTaskId");
     const lookupFetchButton = document.getElementById("lookupFetchButton");
     const lookupClearButton = document.getElementById("lookupClearButton");
+    const exportLookupCsvButton = document.getElementById("exportLookupCsvButton");
     const lookupResultsSection = document.getElementById("lookupResultsSection");
     const lookupResultsTitle = document.getElementById("lookupResultsTitle");
     const lookupResultsHead = document.getElementById("lookupResultsHead");
@@ -224,6 +225,8 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         lookupResultsSection.style.display = "block";
+
+        exportLookupCsvButton.style.display = "inline-block";
     });
 
     // Clear Lookup
@@ -233,6 +236,7 @@ document.addEventListener("DOMContentLoaded", function () {
         lookupResultsHead.innerHTML = "";
         lookupResultsBody.innerHTML = "";
         lookupResultsSection.style.display = "none";
+        exportLookupCsvButton.style.display = "none";
     });
 
     /*
@@ -349,6 +353,124 @@ document.addEventListener("DOMContentLoaded", function () {
         hideTaskStatusButton.addEventListener("click", function () {
             // Hide the table section
             taskStatusTableSection.style.display = "none";
+        });
+    }
+
+    // =====================================
+    // Reusable CSV Export Function
+    // =====================================
+
+    /**
+     * Export an HTML table to a CSV file.
+     *
+     * @param {string} tableId - The ID of the table element to export.
+     * @param {string} filename - The name of the CSV file to save.
+     */
+    function exportTableToCSV(tableId, filename) {
+        // Get the table element by ID
+        const table = document.getElementById(tableId);
+
+        // If table is not found, log an error and exit
+        if (!table) {
+            console.error("Table not found:", tableId);
+            return;
+        }
+
+        // Get all rows (tr elements) from the table
+        const rows = table.querySelectorAll("tr");
+
+        // Array to hold CSV data
+        const csv = [];
+
+        // Loop through each row
+        rows.forEach(function (row) {
+            // Get all cells (both th and td) in the row
+            const cells = row.querySelectorAll("th, td");
+
+            // Extract text from each cell and escape double quotes
+            const rowData = Array.from(cells).map(function (cell) {
+                const value = cell.innerText.replace(/"/g, '""'); // Escape quotes
+                return `"${value}"`; // Wrap each value in quotes
+            });
+
+            // Join cell values with commas and add to CSV array
+            csv.push(rowData.join(","));
+        });
+
+        // Join all rows with newline characters
+        const csvContent = csv.join("\n");
+
+        // Create a Blob object for the CSV content
+        const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+
+        // Create a temporary URL for the Blob
+        const url = URL.createObjectURL(blob);
+
+        // Create a temporary <a> element for download
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = filename;
+
+        // Append link to document, trigger click, then remove it
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        // Release the Blob URL to free memory
+        URL.revokeObjectURL(url);
+    }
+
+    // =====================================
+    // Employee Table CSV Export
+    // =====================================
+
+    // Get the "Export Employee CSV" button
+    const exportEmployeeCsvButton = document.getElementById("exportEmployeeCsvButton");
+
+    if (exportEmployeeCsvButton) {
+        exportEmployeeCsvButton.addEventListener("click", function () {
+            // Export employee table to CSV
+            exportTableToCSV("employeeTable", "employee_table.csv");
+        });
+    }
+
+    // =====================================
+    // Export Lookup Results to CSV
+    // =====================================
+
+    // Get the "Export Lookup Results CSV" button
+    if (exportLookupCsvButton) {
+        exportLookupCsvButton.addEventListener("click", function () {
+            // Export lookup results table to CSV
+            exportTableToCSV("lookupResultsTable", "lookup_results.csv");
+        });
+    }
+
+    // =====================================
+    // Idle Employees CSV Export
+    // =====================================
+
+    // Get the "Export Idle Employees CSV" button
+    const exportIdleEmployeesCsvButton = document.getElementById("exportIdleEmployeesCsvButton");
+
+    if (exportIdleEmployeesCsvButton) {
+        exportIdleEmployeesCsvButton.addEventListener("click", function () {
+            // Export idle employees table to CSV
+            exportTableToCSV("idleEmployeesTable", "idle_employees.csv");
+        });
+    }
+
+    // =====================================
+    // Task Status CSV Export
+    // =====================================
+
+    // Get the "Export Task Status CSV" button
+    const exportTaskStatusCsvButton = document.getElementById("exportTaskStatusCsvButton");
+
+    if (exportTaskStatusCsvButton) {
+        exportTaskStatusCsvButton.addEventListener("click", function () {
+            // Export task status table to CSV
+            exportTableToCSV("taskStatusTable", "task_status_report.csv");
         });
     }
 

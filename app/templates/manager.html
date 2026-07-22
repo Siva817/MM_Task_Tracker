@@ -73,6 +73,7 @@
          EMPLOYEE TABLE TOGGLE
     ========================================= -->
     <button id="toggleTableButton" type="button">Show Employee Table</button>
+    <button id="exportEmployeeCsvButton" type="button">Export Employee to CSV</button>
 
     <!-- Employee Table -->
     <section id="employeeTableContainer" class="employee-table-container hidden">
@@ -129,6 +130,9 @@
         <!-- Lookup Buttons -->
         <button id="lookupFetchButton">Fetch</button>
         <button id="lookupClearButton" type="button">Clear</button>
+        <button id="exportLookupCsvButton" type="button" style="display: none;">
+            Export Lookup Results to CSV
+        </button>
 
         <br><br>
 
@@ -147,6 +151,7 @@
     ========================================= -->
     <br><br>
     <button id="toggleIdleEmployeesButton" type="button">Show Idle Employees</button>
+    <button id="exportIdleEmployeesCsvButton" type="button">Export Idle Employees to CSV</button>
 
     <div id="idleEmployeesSection" style="display: none;">
         <h2>Idle Employees</h2>
@@ -227,6 +232,12 @@
             type="button"
         >
             Hide Task Status Table
+        </button>
+
+        <button
+            id="exportTaskStatusCsvButton"
+        >
+            Export Task Status to CSV
         </button>
 
     </div>
