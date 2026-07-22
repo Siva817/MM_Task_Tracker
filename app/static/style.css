@@ -256,3 +256,146 @@ tr:nth-child(even) {
 .employee-table-container.hidden {
     display: none;
 }
+
+/* ================================
+   Task Visibility Lookup Section
+================================ */
+#taskLookupSection {
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    margin-top: 30px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+#taskLookupSection h2 {
+    font-size: 1.4rem;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+#taskLookupSection p {
+    font-size: 0.95rem;
+    color: #555;
+    margin-bottom: 15px;
+}
+
+#taskLookupSection label {
+    margin-right: 15px;
+    font-weight: 500;
+    color: #444;
+}
+
+#taskLookupSection input[type="text"] {
+    width: 250px;
+    padding: 8px 10px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    transition: border-color 0.2s ease;
+}
+
+#taskLookupSection input[type="text"]:focus {
+    border-color: #0078d7;
+    outline: none;
+}
+
+/* Buttons */
+#lookupFetchButton,
+#lookupClearButton,
+#toggleIdleEmployeesButton {
+    background: #0078d7;
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    margin: 5px 8px 0 0;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+#lookupClearButton {
+    background: #666;
+}
+
+#lookupFetchButton:hover,
+#lookupClearButton:hover,
+#toggleIdleEmployeesButton:hover {
+    background: #005fa3;
+}
+
+/* Lookup Results Table */
+#lookupResultsSection {
+    margin-top: 20px;
+}
+
+#lookupResultsTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    font-size: 0.95rem;
+}
+
+#lookupResultsTable th,
+#lookupResultsTable td {
+    border: 1px solid #ddd;
+    padding: 8px 12px;
+    text-align: left;
+}
+
+#lookupResultsTable th {
+    background: #f0f0f0;
+    font-weight: 600;
+}
+
+/* ================================
+   Idle Employees Section
+================================ */
+#idleEmployeesSection {
+    background: #fdfdfd;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    margin-top: 25px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+#idleEmployeesSection h2 {
+    font-size: 1.3rem;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+#idleEmployeesTable {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95rem;
+}
+
+#idleEmployeesTable th,
+#idleEmployeesTable td {
+    border: 1px solid #ddd;
+    padding: 8px 12px;
+    text-align: left;
+}
+
+#idleEmployeesTable th {
+    background: #f0f0f0;
+    font-weight: 600;
+}
+
+#idleEmployeesTable tr:nth-child(even) {
+    background: #fafafa;
+}
+
+#idleEmployeesTable a {
+    color: #0078d7;
+    text-decoration: none;
+}
+
+#idleEmployeesTable a:hover {
+    text-decoration: underline;
+}

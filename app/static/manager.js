@@ -21,23 +21,16 @@ document.addEventListener("DOMContentLoaded", function () {
             type: "doughnut",
             data: {
                 labels: ["Idle", "Production"],
-                datasets: [
-                    {
-                        data: [idleCount, productionCount]
-                    }
-                ]
+                datasets: [{ data: [idleCount, productionCount] }],
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
                     legend: { position: "bottom" },
-                    title: {
-                        display: true,
-                        text: "Idle vs Production"
-                    }
-                }
-            }
+                    title: { display: true, text: "Idle vs Production" },
+                },
+            },
         });
     }
 
@@ -56,12 +49,7 @@ document.addEventListener("DOMContentLoaded", function () {
             type: "bar",
             data: {
                 labels: taskLabels,
-                datasets: [
-                    {
-                        label: "Employees",
-                        data: employeeCounts
-                    }
-                ]
+                datasets: [{ label: "Employees", data: employeeCounts }],
             },
             options: {
                 indexAxis: "y",
@@ -69,18 +57,12 @@ document.addEventListener("DOMContentLoaded", function () {
                 maintainAspectRatio: false,
                 plugins: {
                     legend: { display: false },
-                    title: {
-                        display: true,
-                        text: "Task Visibility"
-                    }
+                    title: { display: true, text: "Task Visibility" },
                 },
                 scales: {
-                    x: {
-                        beginAtZero: true,
-                        ticks: { stepSize: 1 }
-                    }
-                }
-            }
+                    x: { beginAtZero: true, ticks: { stepSize: 1 } },
+                },
+            },
         });
     }
 
@@ -102,38 +84,15 @@ document.addEventListener("DOMContentLoaded", function () {
         const selectedDate = dateFilter.value;
         const params = new URLSearchParams();
 
-        // Manager
-        if (selectedManager !== "All") {
-            params.set("selected_manager", selectedManager);
-        }
+        if (selectedManager !== "All") params.set("selected_manager", selectedManager);
+        if (selectedDate !== "") params.set("selected_date", selectedDate);
 
-        // Date
-        if (selectedDate !== "") {
-            params.set("selected_date", selectedDate);
-        }
-
-        // Redirect
         const queryString = params.toString();
         window.location.href = queryString ? `/manager?${queryString}` : "/manager";
     }
 
-    /*
-    ==================================================
-    MANAGER FILTER
-    ==================================================
-    */
-    if (managerFilter) {
-        managerFilter.addEventListener("change", applyFilters);
-    }
-
-    /*
-    ==================================================
-    DATE FILTER
-    ==================================================
-    */
-    if (dateFilter) {
-        dateFilter.addEventListener("change", applyFilters);
-    }
+    if (managerFilter) managerFilter.addEventListener("change", applyFilters);
+    if (dateFilter) dateFilter.addEventListener("change", applyFilters);
 
     /*
     ==================================================
@@ -150,345 +109,143 @@ document.addEventListener("DOMContentLoaded", function () {
             const tableIsHidden = employeeTableContainer.classList.contains("hidden");
             toggleTableButton.textContent = tableIsHidden ? "Show Employee Table" : "Hide Employee Table";
 
-            // Scroll down to the table when shown
             if (!tableIsHidden) {
                 setTimeout(() => {
-                    employeeTableContainer.scrollIntoView({
-                        behavior: "smooth",
-                        block: "start"
-                    });
+                    employeeTableContainer.scrollIntoView({ behavior: "smooth", block: "start" });
                 }, 100);
             }
         });
     }
 
-    // =====================================
-    // Task Visibility Lookup
-    // =====================================
+    /*
+    ==================================================
+    TASK VISIBILITY LOOKUP
+    ==================================================
+    */
+    const lookupEmployeeRadio = document.querySelector('input[name="lookupType"][value="employee"]');
+    const lookupTaskRadio = document.querySelector('input[name="lookupType"][value="task"]');
+    const employeeIdLookup = document.getElementById("employeeIdLookup");
+    const taskIdLookup = document.getElementById("taskIdLookup");
+    const lookupEmployeeId = document.getElementById("lookupEmployeeId");
+    const lookupTaskId = document.getElementById("lookupTaskId");
+    const lookupFetchButton = document.getElementById("lookupFetchButton");
+    const lookupClearButton = document.getElementById("lookupClearButton");
+    const lookupResultsSection = document.getElementById("lookupResultsSection");
+    const lookupResultsTitle = document.getElementById("lookupResultsTitle");
+    const lookupResultsHead = document.getElementById("lookupResultsHead");
+    const lookupResultsBody = document.getElementById("lookupResultsBody");
 
-    const lookupEmployeeRadio =
-        document.querySelector(
-            'input[name="lookupType"][value="employee"]'
-        );
+    // Switch between Employee ID / Task ID
+    lookupEmployeeRadio.addEventListener("change", function () {
+        employeeIdLookup.style.display = "block";
+        taskIdLookup.style.display = "none";
+        lookupTaskId.value = "";
+        lookupResultsSection.style.display = "none";
+    });
 
-    const lookupTaskRadio =
-        document.querySelector(
-            'input[name="lookupType"][value="task"]'
-        );
+    lookupTaskRadio.addEventListener("change", function () {
+        employeeIdLookup.style.display = "none";
+        taskIdLookup.style.display = "block";
+        lookupEmployeeId.value = "";
+        lookupResultsSection.style.display = "none";
+    });
 
-    const employeeIdLookup =
-        document.getElementById(
-            "employeeIdLookup"
-        );
-
-    const taskIdLookup =
-        document.getElementById(
-            "taskIdLookup"
-        );
-
-    const lookupEmployeeId =
-        document.getElementById(
-            "lookupEmployeeId"
-        );
-
-    const lookupTaskId =
-        document.getElementById(
-            "lookupTaskId"
-        );
-
-    const lookupFetchButton =
-        document.getElementById(
-            "lookupFetchButton"
-        );
-
-    const lookupClearButton =
-        document.getElementById(
-            "lookupClearButton"
-        );
-
-    const lookupResultsSection =
-        document.getElementById(
-            "lookupResultsSection"
-        );
-
-    const lookupResultsTitle =
-        document.getElementById(
-            "lookupResultsTitle"
-        );
-
-    const lookupResultsHead =
-        document.getElementById(
-            "lookupResultsHead"
-        );
-
-    const lookupResultsBody =
-        document.getElementById(
-            "lookupResultsBody"
-        );
-
-
-    // =====================================
-    // Switch Between Employee ID / Task ID
-    // =====================================
-
-    lookupEmployeeRadio.addEventListener(
-        "change",
-        function () {
-
-            employeeIdLookup.style.display =
-                "block";
-
-            taskIdLookup.style.display =
-                "none";
-
-            lookupTaskId.value = "";
-
-            lookupResultsSection.style.display =
-                "none";
-
-        }
-    );
-
-
-    lookupTaskRadio.addEventListener(
-        "change",
-        function () {
-
-            employeeIdLookup.style.display =
-                "none";
-
-            taskIdLookup.style.display =
-                "block";
-
-            lookupEmployeeId.value = "";
-
-            lookupResultsSection.style.display =
-                "none";
-
-        }
-    );
-
-
-    // =====================================
     // Fetch Lookup Data
-    // =====================================
-
-    lookupFetchButton.addEventListener(
-        "click",
-        async function () {
-
-            const selectedManager =
-                managerFilter.value;
-
-            const isEmployeeSearch =
-                lookupEmployeeRadio.checked;
-
-
-            let lookupValue;
-
-
-            if (isEmployeeSearch) {
-
-                lookupValue =
-                    lookupEmployeeId.value.trim();
-
-                if (!lookupValue) {
-
-                    alert(
-                        "Please enter an Employee ID."
-                    );
-
-                    return;
-
-                }
-
-            } else {
-
-                lookupValue =
-                    lookupTaskId.value.trim();
-
-                if (!lookupValue) {
-
-                    alert(
-                        "Please enter a Task ID."
-                    );
-
-                    return;
-
-                }
-
-            }
-
-
-            const params =
-                new URLSearchParams();
-
-
-            params.append(
-                "lookup_type",
-                isEmployeeSearch
-                    ? "employee"
-                    : "task"
-            );
-
-
-            if (
-                selectedManager !== "All"
-            ) {
-
-                params.append(
-                    "selected_manager",
-                    selectedManager
-                );
-
-            }
-
-
-            if (isEmployeeSearch) {
-
-                params.append(
-                    "employee_id",
-                    lookupValue
-                );
-
-            } else {
-
-                params.append(
-                    "task_id",
-                    lookupValue
-                );
-
-            }
-
-
-            const response =
-                await fetch(
-                    "/manager/lookup?" +
-                    params.toString()
-                );
-
-
-            if (!response.ok) {
-
-                alert(
-                    "Failed to fetch lookup data."
-                );
-
-                return;
-
-            }
-
-
-            const data =
-                await response.json();
-
-
-            lookupResultsHead.innerHTML =
-                "";
-
-            lookupResultsBody.innerHTML =
-                "";
-
-
-            if (isEmployeeSearch) {
-
-                lookupResultsTitle.textContent =
-                    "Latest Visible Tasks";
-
-
-                lookupResultsHead.innerHTML = `
-                    <tr>
-                        <th>Task ID</th>
-                        <th>Task Name</th>
-                        <th>Jobs</th>
-                        <th>Remarks</th>
-                        <th>Submitted At</th>
-                    </tr>
-                `;
-
-
-                data.forEach(
-                    function (row) {
-
-                        lookupResultsBody.innerHTML += `
-                            <tr>
-                                <td>${row.task_id}</td>
-                                <td>${row.task_name}</td>
-                                <td>${row.jobs || ""}</td>
-                                <td>${row.remarks || ""}</td>
-                                <td>${row.submitted_at}</td>
-                            </tr>
-                        `;
-
-                    }
-                );
-
-            } else {
-
-                lookupResultsTitle.textContent =
-                    "Employees with Task Visible";
-
-
-                lookupResultsHead.innerHTML = `
-                    <tr>
-                        <th>Employee ID</th>
-                        <th>Employee Name</th>
-                        <th>Last Log Time</th>
-                    </tr>
-                `;
-
-
-                data.forEach(
-                    function (row) {
-
-                        lookupResultsBody.innerHTML += `
-                            <tr>
-                                <td>${row.employee_id}</td>
-                                <td>${row.employee_name.replace(/\b\w/g, c => c.toUpperCase())}</td>
-                                <td>${row.last_log_time}</td>
-                            </tr>
-                        `;
-
-                    }
-                );
-
-            }
-
-
-            lookupResultsSection.style.display =
-                "block";
-
+    lookupFetchButton.addEventListener("click", async function () {
+        const selectedManager = managerFilter.value;
+        const isEmployeeSearch = lookupEmployeeRadio.checked;
+        let lookupValue;
+
+        if (isEmployeeSearch) {
+            lookupValue = lookupEmployeeId.value.trim();
+            if (!lookupValue) return alert("Please enter an Employee ID.");
+        } else {
+            lookupValue = lookupTaskId.value.trim();
+            if (!lookupValue) return alert("Please enter a Task ID.");
         }
-    );
 
+        const params = new URLSearchParams();
+        params.append("lookup_type", isEmployeeSearch ? "employee" : "task");
+        if (selectedManager !== "All") params.append("selected_manager", selectedManager);
+        if (isEmployeeSearch) params.append("employee_id", lookupValue);
+        else params.append("task_id", lookupValue);
 
-    // =====================================
+        const response = await fetch("/manager/lookup?" + params.toString());
+        if (!response.ok) return alert("Failed to fetch lookup data.");
+
+        const data = await response.json();
+        lookupResultsHead.innerHTML = "";
+        lookupResultsBody.innerHTML = "";
+
+        if (isEmployeeSearch) {
+            lookupResultsTitle.textContent = "Latest Visible Tasks";
+            lookupResultsHead.innerHTML = `
+                <tr>
+                    <th>Task ID</th>
+                    <th>Task Name</th>
+                    <th>Jobs</th>
+                    <th>Remarks</th>
+                    <th>Submitted At</th>
+                </tr>
+            `;
+            data.forEach(row => {
+                lookupResultsBody.innerHTML += `
+                    <tr>
+                        <td>${row.task_id}</td>
+                        <td>${row.task_name}</td>
+                        <td>${row.jobs || ""}</td>
+                        <td>${row.remarks || ""}</td>
+                        <td>${row.submitted_at}</td>
+                    </tr>
+                `;
+            });
+        } else {
+            lookupResultsTitle.textContent = "Employees with Task Visible";
+            lookupResultsHead.innerHTML = `
+                <tr>
+                    <th>Employee ID</th>
+                    <th>Employee Name</th>
+                    <th>Last Log Time</th>
+                </tr>
+            `;
+            data.forEach(row => {
+                lookupResultsBody.innerHTML += `
+                    <tr>
+                        <td>${row.employee_id}</td>
+                        <td>${row.employee_name.replace(/\b\w/g, c => c.toUpperCase())}</td>
+                        <td>${row.last_log_time}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        lookupResultsSection.style.display = "block";
+    });
+
     // Clear Lookup
-    // =====================================
+    lookupClearButton.addEventListener("click", function () {
+        lookupEmployeeId.value = "";
+        lookupTaskId.value = "";
+        lookupResultsHead.innerHTML = "";
+        lookupResultsBody.innerHTML = "";
+        lookupResultsSection.style.display = "none";
+    });
 
-    lookupClearButton.addEventListener(
-        "click",
-        function () {
+    /*
+    ==================================================
+    IDLE EMPLOYEES TABLE TOGGLE
+    ==================================================
+    */
+    const toggleIdleEmployeesButton = document.getElementById("toggleIdleEmployeesButton");
+    const idleEmployeesSection = document.getElementById("idleEmployeesSection");
 
-            lookupEmployeeId.value =
-                "";
-
-            lookupTaskId.value =
-                "";
-
-            lookupResultsHead.innerHTML =
-                "";
-
-            lookupResultsBody.innerHTML =
-                "";
-
-            lookupResultsSection.style.display =
-                "none";
-
+    toggleIdleEmployeesButton.addEventListener("click", function () {
+        if (idleEmployeesSection.style.display === "none") {
+            idleEmployeesSection.style.display = "block";
+            toggleIdleEmployeesButton.textContent = "Hide Idle Employees";
+        } else {
+            idleEmployeesSection.style.display = "none";
+            toggleIdleEmployeesButton.textContent = "Show Idle Employees";
         }
-    );
-
-
-
-
+    });
 });

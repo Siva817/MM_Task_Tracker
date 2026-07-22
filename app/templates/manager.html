@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- Meta & Title -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manager Dashboard</title>
 
+    <!-- Styles & Chart.js -->
     <link rel="stylesheet" href="/static/style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -13,9 +15,10 @@
     <h1>Manager Dashboard</h1>
 
     <!-- ========================================
-         FILTERS
+         FILTERS SECTION
     ========================================= -->
     <section class="filters">
+        <!-- Manager Filter -->
         <div class="filter-group">
             <label for="managerFilter"><b>Manager</b></label>
             <select id="managerFilter">
@@ -26,6 +29,7 @@
             </select>
         </div>
 
+        <!-- Date Filter -->
         <div class="filter-group">
             <label for="dateFilter"><b>Date</b></label>
             <input type="date" id="dateFilter" value="{{ selected_date or '' }}">
@@ -33,29 +37,26 @@
     </section>
 
     <!-- ========================================
-         SUMMARY SECTION
-         CARDS LEFT + DOUGHNUT RIGHT
+         SUMMARY SECTION (Cards + Doughnut Chart)
     ========================================= -->
     <section class="summary-section">
-        <!-- CARDS -->
+        <!-- Cards -->
         <div class="dashboard-summary">
             <div class="summary-card">
                 <h3>Idle</h3>
                 <p>{{ status_counts.idle }}</p>
             </div>
-
             <div class="summary-card">
                 <h3>Production</h3>
                 <p>{{ status_counts.production }}</p>
             </div>
-
             <div class="summary-card">
                 <h3>Total Employees</h3>
                 <p>{{ status_counts.total }}</p>
             </div>
         </div>
 
-        <!-- DOUGHNUT -->
+        <!-- Doughnut Chart -->
         <div class="status-chart-container">
             <canvas id="statusChart" aria-label="Employee status distribution chart"></canvas>
         </div>
@@ -69,13 +70,11 @@
     </section>
 
     <!-- ========================================
-         TABLE TOGGLE BUTTON
+         EMPLOYEE TABLE TOGGLE
     ========================================= -->
     <button id="toggleTableButton" type="button">Show Employee Table</button>
 
-    <!-- ========================================
-         EMPLOYEE TABLE
-    ========================================= -->
+    <!-- Employee Table -->
     <section id="employeeTableContainer" class="employee-table-container hidden">
         <table id="employeeTable">
             <caption>Latest Employee Submissions</caption>
@@ -100,137 +99,89 @@
         </table>
     </section>
 
-    <!-- ===================================== -->
-    <!-- Task Visibility Lookup -->
-    <!-- ===================================== -->
-
+    <!-- ========================================
+         TASK VISIBILITY LOOKUP
+    ========================================= -->
     <div id="taskLookupSection">
-
         <h2>Task Visibility Lookup</h2>
+        <p>Search for the latest visible tasks of an employee or find employees who have a task visible.</p>
 
-        <p>
-            Search for the latest visible tasks of an employee
-            or find employees who have a task visible.
-        </p>
-
-
-        <!-- Search Type -->
-
-        <label>
-            <input
-                type="radio"
-                name="lookupType"
-                value="employee"
-                checked
-            >
-
-            Employee ID
-        </label>
-
-
-        <label>
-            <input
-                type="radio"
-                name="lookupType"
-                value="task"
-            >
-
-            Task ID
-        </label>
-
+        <!-- Lookup Type -->
+        <label><input type="radio" name="lookupType" value="employee" checked> Employee ID</label>
+        <label><input type="radio" name="lookupType" value="task"> Task ID</label>
 
         <br><br>
 
-
         <!-- Employee ID Input -->
-
         <div id="employeeIdLookup">
-
-            <label for="lookupEmployeeId">
-                Employee ID
-            </label>
-
-            <input
-                type="text"
-                id="lookupEmployeeId"
-                placeholder="Enter Employee ID"
-            >
-
+            <label for="lookupEmployeeId">Employee ID</label>
+            <input type="text" id="lookupEmployeeId" placeholder="Enter Employee ID">
         </div>
-
 
         <!-- Task ID Input -->
-
-        <div
-            id="taskIdLookup"
-            style="display: none;"
-        >
-
-            <label for="lookupTaskId">
-                Task ID
-            </label>
-
-            <input
-                type="text"
-                id="lookupTaskId"
-                placeholder="Enter Task ID"
-            >
-
+        <div id="taskIdLookup" style="display: none;">
+            <label for="lookupTaskId">Task ID</label>
+            <input type="text" id="lookupTaskId" placeholder="Enter Task ID">
         </div>
-
 
         <br>
 
-        <button id="lookupFetchButton">
-            Fetch
-        </button>
-
-
-        <button
-            id="lookupClearButton"
-            type="button"
-        >
-            Clear
-        </button>
-
+        <!-- Lookup Buttons -->
+        <button id="lookupFetchButton">Fetch</button>
+        <button id="lookupClearButton" type="button">Clear</button>
 
         <br><br>
 
-
         <!-- Lookup Results -->
-
-        <div
-            id="lookupResultsSection"
-            style="display: none;"
-        >
-
+        <div id="lookupResultsSection" style="display: none;">
             <h3 id="lookupResultsTitle"></h3>
-
-
-            <table
-                id="lookupResultsTable"
-                border="1"
-                cellpadding="6"
-                cellspacing="0"
-            >
-
-                <thead id="lookupResultsHead">
-
-                </thead>
-
-
-                <tbody id="lookupResultsBody">
-
-                </tbody>
-
+            <table id="lookupResultsTable" border="1" cellpadding="6" cellspacing="0">
+                <thead id="lookupResultsHead"></thead>
+                <tbody id="lookupResultsBody"></tbody>
             </table>
-
         </div>
-
     </div>
 
     <!-- ========================================
-         DASHBOARD DATA
+         IDLE EMPLOYEES TABLE
+    ========================================= -->
+    <br><br>
+    <button id="toggleIdleEmployeesButton" type="button">Show Idle Employees</button>
+
+    <div id="idleEmployeesSection" style="display: none;">
+        <h2>Idle Employees</h2>
+        <table id="idleEmployeesTable" border="1" cellpadding="6" cellspacing="0">
+            <thead>
+                <tr>
+                    <th>Employee ID</th>
+                    <th>Employee Name</th>
+                    <th>Manager</th>
+                    <th>Drive Link</th>
+                    <th>Remarks</th>
+                    <th>Last Log Time</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for employee in idle_employees %}
+                <tr>
+                    <td>{{ employee.employee_id }}</td>
+                    <td>{{ employee.employee_name.title() }}</td>
+                    <td>{{ employee.manager }}</td>
+                    <td>
+                        {% if employee.drive_link %}
+                        <a href="{{ employee.drive_link }}" target="_blank">Open Link</a>
+                        {% endif %}
+                    </td>
+                    <td>{{ employee.idle_remarks }}</td>
+                    <td>{{ employee.submitted_at }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- ========================================
+         DASHBOARD DATA (Injected into JS)
     ========================================= -->
     <script>
         window.managerDashboardData = {
@@ -238,10 +189,8 @@
             production: {{ status_counts.production }},
             taskVisibility: [
                 {% for task in task_visibility %}
-                {
-                    taskId: "{{ task.task_id }}",
-                    employeeCount: {{ task.employee_count }}
-                }{% if not loop.last %},{% endif %}
+                { taskId: "{{ task.task_id }}", employeeCount: {{ task.employee_count }} }
+                {% if not loop.last %},{% endif %}
                 {% endfor %}
             ]
         };

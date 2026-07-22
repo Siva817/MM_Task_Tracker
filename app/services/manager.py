@@ -1,3 +1,4 @@
+from datetime import datetime
 from app.db.database import get_connection
 
 
@@ -11,7 +12,6 @@ def get_all_submissions():
     connection = get_connection()
     cursor = connection.cursor()
 
-    # Fetch all submissions ordered by submission time (latest first)
     cursor.execute("""
         SELECT
             employee_id,
@@ -27,7 +27,6 @@ def get_all_submissions():
     rows = cursor.fetchall()
     connection.close()
 
-    # Convert rows to dictionaries for easier handling
     return [dict(row) for row in rows]
 
 
@@ -41,7 +40,6 @@ def get_managers():
     connection = get_connection()
     cursor = connection.cursor()
 
-    # Fetch all managers ordered alphabetically
     cursor.execute("""
         SELECT name
         FROM managers
@@ -51,16 +49,14 @@ def get_managers():
     rows = cursor.fetchall()
     connection.close()
 
-    # Extract only the 'name' field from each row
     return [row["name"] for row in rows]
 
 
-def get_latest_submissions(selected_date=None, manager=None):
+def get_latest_submissions(selected_date: str | None = None, manager: str | None = None):
     connection = get_connection()
     cursor = connection.cursor()
 
-    conditions = []
-    params = []
+    conditions, params = [], []
 
     if selected_date:
         conditions.append("DATE(submitted_at) = ?")
@@ -70,10 +66,7 @@ def get_latest_submissions(selected_date=None, manager=None):
         conditions.append("manager = ?")
         params.append(manager)
 
-    where_clause = ""
-
-    if conditions:
-        where_clause = "WHERE " + " AND ".join(conditions)
+    where_clause = f"WHERE {' AND '.join(conditions)}" if conditions else ""
 
     cursor.execute(f"""
         SELECT *
@@ -88,12 +81,12 @@ def get_latest_submissions(selected_date=None, manager=None):
     """, params)
 
     rows = cursor.fetchall()
-
     connection.close()
 
     return rows
 
-def get_employee_status_counts(selected_date=None, manager=None):
+
+def get_employee_status_counts(selected_date: str | None = None, manager: str | None = None):
     connection = get_connection()
     cursor = connection.cursor()
 
@@ -101,10 +94,8 @@ def get_employee_status_counts(selected_date=None, manager=None):
         date_filter = "WHERE DATE(submitted_at) = ?"
         params = [selected_date]
     else:
-        date_filter = ""
-        params = []
+        date_filter, params = "", []
 
-    # Get latest submission for each employee
     query = f"""
         SELECT *
         FROM submissions
@@ -117,39 +108,25 @@ def get_employee_status_counts(selected_date=None, manager=None):
     """
 
     cursor.execute(query, params)
-
     rows = cursor.fetchall()
 
-    # Apply manager filter
     if manager and manager != "All":
-        rows = [
-            row for row in rows
-            if row["manager"] == manager
-        ]
+        rows = [row for row in rows if row["manager"] == manager]
 
     total = len(rows)
-
-    idle = sum(
-        1 for row in rows
-        if row["idle"] == 1
-    )
-
+    idle = sum(1 for row in rows if row["idle"] == 1)
     production = total - idle
 
     connection.close()
 
-    return {
-        "total": total,
-        "idle": idle,
-        "production": production
-    }
+    return {"total": total, "idle": idle, "production": production}
 
-def get_task_visibility(selected_date=None, manager=None):
+
+def get_task_visibility(selected_date: str | None = None, manager: str | None = None):
     connection = get_connection()
     cursor = connection.cursor()
 
-    conditions = []
-    params = []
+    conditions, params = [], []
 
     if selected_date:
         conditions.append("DATE(s.submitted_at) = ?")
@@ -159,10 +136,7 @@ def get_task_visibility(selected_date=None, manager=None):
         conditions.append("s.manager = ?")
         params.append(manager)
 
-    where_clause = ""
-
-    if conditions:
-        where_clause = "WHERE " + " AND ".join(conditions)
+    where_clause = f"WHERE {' AND '.join(conditions)}" if conditions else ""
 
     cursor.execute(f"""
         SELECT
@@ -170,9 +144,7 @@ def get_task_visibility(selected_date=None, manager=None):
             t.task_name,
             COUNT(DISTINCT s.employee_id) AS employee_count
         FROM tasks t
-        INNER JOIN submissions s
-            ON t.submission_id = s.id
-
+        INNER JOIN submissions s ON t.submission_id = s.id
         INNER JOIN (
             SELECT
                 employee_id,
@@ -180,22 +152,18 @@ def get_task_visibility(selected_date=None, manager=None):
             FROM submissions s
             {where_clause}
             GROUP BY employee_id
-        ) latest
-            ON s.id = latest.latest_submission_id
-
+        ) latest ON s.id = latest.latest_submission_id
         GROUP BY t.task_id, t.task_name
         ORDER BY employee_count DESC
     """, params)
 
     rows = cursor.fetchall()
-
     connection.close()
 
     return rows
 
 
-def get_employees_with_visible_task(task_id, manager=None):
-
+def get_employees_with_visible_task(task_id: str, manager: str | None = None):
     connection = get_connection()
     cursor = connection.cursor()
 
@@ -206,10 +174,7 @@ def get_employees_with_visible_task(task_id, manager=None):
             s.manager,
             s.submitted_at AS last_log_time
         FROM submissions s
-
-        INNER JOIN tasks t
-            ON t.submission_id = s.id
-
+        INNER JOIN tasks t ON t.submission_id = s.id
         INNER JOIN (
             SELECT
                 employee_id,
@@ -218,44 +183,27 @@ def get_employees_with_visible_task(task_id, manager=None):
     """
 
     params = []
-
-
     if manager and manager != "All":
-
-        query += """
-            WHERE manager = ?
-        """
-
+        query += " WHERE manager = ?"
         params.append(manager)
-
 
     query += """
             GROUP BY employee_id
-        ) latest
-
-        ON s.id = latest.latest_submission_id
-
+        ) latest ON s.id = latest.latest_submission_id
         WHERE LOWER(t.task_id) = LOWER(?)
-
         ORDER BY s.employee_name
     """
 
     params.append(task_id)
-
-
-    cursor.execute(
-        query,
-        params
-    )
+    cursor.execute(query, params)
 
     rows = cursor.fetchall()
-
     connection.close()
 
     return rows
 
-def get_employee_visible_tasks(employee_id, manager=None):
 
+def get_employee_visible_tasks(employee_id: str, manager: str | None = None):
     connection = get_connection()
     cursor = connection.cursor()
 
@@ -270,10 +218,7 @@ def get_employee_visible_tasks(employee_id, manager=None):
             t.jobs,
             t.remarks
         FROM submissions s
-
-        INNER JOIN tasks t
-            ON t.submission_id = s.id
-
+        INNER JOIN tasks t ON t.submission_id = s.id
         INNER JOIN (
             SELECT
                 employee_id,
@@ -283,31 +228,61 @@ def get_employee_visible_tasks(employee_id, manager=None):
     """
 
     params = [employee_id]
-
     if manager and manager != "All":
-
-        query += """
-            AND manager = ?
-        """
-
+        query += " AND manager = ?"
         params.append(manager)
 
     query += """
             GROUP BY employee_id
-        ) latest
-
-        ON s.id = latest.latest_submission_id
-
+        ) latest ON s.id = latest.latest_submission_id
         ORDER BY t.task_name
     """
 
-    cursor.execute(
-        query,
-        params
-    )
-
+    cursor.execute(query, params)
     rows = cursor.fetchall()
+    connection.close()
 
+    return rows
+
+
+def get_idle_employees(selected_date: str | None = None, manager: str | None = None):
+    connection = get_connection()
+    cursor = connection.cursor()
+
+    if not selected_date:
+        selected_date = datetime.now().strftime("%Y-%m-%d")
+
+    query = """
+        SELECT
+            s.employee_id,
+            s.employee_name,
+            s.manager,
+            s.drive_link,
+            s.idle_remarks,
+            s.submitted_at
+        FROM submissions s
+        INNER JOIN (
+            SELECT
+                employee_id,
+                MAX(id) AS latest_submission_id
+            FROM submissions
+            WHERE DATE(submitted_at) = ?
+    """
+
+    params = [selected_date]
+    if manager and manager != "All":
+        query += " AND manager = ?"
+        params.append(manager)
+
+    query += """
+            GROUP BY employee_id
+        ) latest ON s.id = latest.latest_submission_id
+        WHERE s.idle = 1
+        ORDER BY s.submitted_at DESC
+    """
+
+    cursor.execute(query, params)
+    rows = cursor.fetchall()
     connection.close()
 
     return rows
