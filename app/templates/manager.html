@@ -180,6 +180,92 @@
         </table>
     </div>
 
+
+<br><br>
+
+    <!-- ===================================== -->
+    <!-- Task Status Report -->
+    <!-- ===================================== -->
+
+    <div id="taskStatusReportControls">
+
+        <h2>Task Status Report</h2>
+
+        <label for="taskStatusFilter">
+            <b>Task Status</b>
+        </label>
+
+        <select id="taskStatusFilter">
+
+            <option value="Not Checked">
+                Not Checked
+            </option>
+
+            <option value="Jobs Available">
+                Jobs Available
+            </option>
+
+            <option value="Jobs Not Available">
+                Jobs Not Available
+            </option>
+
+            <option value="Error / Can't Work">
+                Error / Can't Work
+            </option>
+
+        </select>
+
+        <button 
+            id="fetchTaskStatusButton"
+            type="button"
+        >
+            Fetch Task Status
+        </button>
+
+        <button
+            id="hideTaskStatusButton"
+            type="button"
+        >
+            Hide Task Status Table
+        </button>
+
+    </div>
+
+
+    <!-- ===================================== -->
+    <!-- Task Status Table -->
+    <!-- ===================================== -->
+
+    <div
+        id="taskStatusTableSection"
+        style="display: none;"
+    >
+
+        <br>
+
+        <table
+            id="taskStatusTable"
+            border="1"
+            cellpadding="6"
+            cellspacing="0"
+        >
+
+            <thead>
+
+                <tr>
+                    <th>Task ID</th>
+                    <th>No. of Employees Reported</th>
+                </tr>
+
+            </thead>
+
+            <tbody>
+            </tbody>
+
+        </table>
+
+    </div>
+
     <!-- ========================================
          DASHBOARD DATA (Injected into JS)
     ========================================= -->

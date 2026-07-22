@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Request
 from fastapi.responses import HTMLResponse
+from fastapi.responses import JSONResponse
 from fastapi.templating import Jinja2Templates
 from app.services.manager import (
     get_all_submissions,
@@ -10,6 +11,7 @@ from app.services.manager import (
     get_employee_visible_tasks,
     get_employees_with_visible_task,
     get_idle_employees,
+    get_task_status_report
 )
 
 # Create router instance
@@ -60,11 +62,23 @@ async def manager_page(
         selected_manager,
     )
 
+    task_status = request.query_params.get(
+        "task_status"
+    )
+
+    task_status_report = get_task_status_report(
+        selected_date,
+        selected_manager,
+        task_status
+    )
+
     # Debug print for idle employees
-    print("\n===== Idle Employees =====")
-    for employee in idle_employees:
-        print(dict(employee))
-    print("===== End Idle Employees =====\n")
+    print("\n===== Task Status Report =====")
+
+    for task in task_status_report:
+        print(dict(task))
+
+    print("===== End Task Status Report =====\n")
 
     # Render template with context data
     return templates.TemplateResponse(
@@ -80,6 +94,7 @@ async def manager_page(
             "selected_date": selected_date,
             "selected_manager": selected_manager,
             "idle_employees": idle_employees,
+            "task_status_report": task_status_report
         },
     )
 
@@ -134,3 +149,27 @@ async def manager_lookup(
 
     # Invalid lookup type
     return {"error": "Invalid lookup type"}
+
+
+@router.get("/task-status-report")
+async def task_status_report_api(
+    selected_manager: str = "All",
+    selected_date: str = None,
+    task_status: str = "None"
+):
+
+    rows = get_task_status_report(
+        selected_date,
+        selected_manager,
+        task_status
+    )
+
+    return JSONResponse(
+        content=[
+            {
+                "task_id": row["task_id"],
+                "employee_count": row["employee_count"]
+            }
+            for row in rows
+        ]
+    )

@@ -73,6 +73,7 @@ document.addEventListener("DOMContentLoaded", function () {
     */
     const managerFilter = document.getElementById("managerFilter");
     const dateFilter = document.getElementById("dateFilter");
+    const taskStatusFilter = document.getElementById("taskStatusFilter");
 
     /*
     ==================================================
@@ -82,17 +83,20 @@ document.addEventListener("DOMContentLoaded", function () {
     function applyFilters() {
         const selectedManager = managerFilter.value;
         const selectedDate = dateFilter.value;
+        const selectedTaskStatus =taskStatusFilter.value;
+
         const params = new URLSearchParams();
 
         if (selectedManager !== "All") params.set("selected_manager", selectedManager);
         if (selectedDate !== "") params.set("selected_date", selectedDate);
+        if (selectedTaskStatus !== "All") params.set("task_status", selectedTaskStatus);
 
         const queryString = params.toString();
         window.location.href = queryString ? `/manager?${queryString}` : "/manager";
     }
 
-    if (managerFilter) managerFilter.addEventListener("change", applyFilters);
-    if (dateFilter) dateFilter.addEventListener("change", applyFilters);
+    if (managerFilter) { managerFilter.addEventListener("change", applyFilters);}
+    if (dateFilter) { dateFilter.addEventListener("change", applyFilters);}
 
     /*
     ==================================================
@@ -248,4 +252,105 @@ document.addEventListener("DOMContentLoaded", function () {
             toggleIdleEmployeesButton.textContent = "Show Idle Employees";
         }
     });
+
+    // =====================================
+    // Task Status Report Script
+    // =====================================
+
+    // Get references to DOM elements
+    const fetchTaskStatusButton = document.getElementById("fetchTaskStatusButton");
+    const hideTaskStatusButton = document.getElementById("hideTaskStatusButton");
+    const taskStatusTableSection = document.getElementById("taskStatusTableSection");
+    const taskStatusTableBody = document.querySelector("#taskStatusTable tbody");
+
+    // =====================================
+    // Fetch and Show Task Status Table
+    // =====================================
+    if (fetchTaskStatusButton) {
+        fetchTaskStatusButton.addEventListener("click", async function () {
+            console.log("Task status button clicked");
+
+            // Get current filter values
+            const selectedManager = managerFilter.value;
+            const selectedDate = dateFilter.value;
+            const selectedTaskStatus = taskStatusFilter.value;
+
+            // Build API parameters
+            const params = new URLSearchParams();
+
+            if (selectedManager !== "All") {
+                params.set("selected_manager", selectedManager);
+            }
+
+            if (selectedDate !== "") {
+                params.set("selected_date", selectedDate);
+            }
+
+            if (selectedTaskStatus !== "None") {
+                params.set("task_status", selectedTaskStatus);
+            }
+
+            console.log("Fetching:", "/manager/task-status-report?" + params.toString());
+
+            try {
+                // Fetch filtered data from API
+                const response = await fetch("/manager/task-status-report?" + params.toString());
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error("Task status API failed:", response.status, errorText);
+                    throw new Error(`Task status API failed: ${response.status}`);
+                }
+
+                const data = await response.json();
+                console.log("Task status report:", data);
+
+                // Clear old table rows
+                taskStatusTableBody.innerHTML = "";
+
+                // Generate new rows from API data
+                data.forEach(function (task) {
+                    const row = document.createElement("tr");
+
+                    const taskIdCell = document.createElement("td");
+                    taskIdCell.textContent = task.task_id;
+
+                    const employeeCountCell = document.createElement("td");
+                    employeeCountCell.textContent = task.employee_count;
+
+                    row.appendChild(taskIdCell);
+                    row.appendChild(employeeCountCell);
+
+                    taskStatusTableBody.appendChild(row);
+                });
+
+                // Show table section
+                taskStatusTableSection.style.display = "block";
+
+                // Smooth scroll to table
+                setTimeout(function () {
+                    taskStatusTableSection.scrollIntoView({
+                        behavior: "smooth",
+                        block: "start"
+                    });
+                }, 100);
+
+            } catch (error) {
+                console.error("Task status error:", error);
+                alert("Failed to load task status report.");
+            }
+        });
+    }
+
+    // =====================================
+    // Hide Task Status Table
+    // =====================================
+    if (hideTaskStatusButton) {
+        hideTaskStatusButton.addEventListener("click", function () {
+            // Hide the table section
+            taskStatusTableSection.style.display = "none";
+        });
+    }
+
+
 });

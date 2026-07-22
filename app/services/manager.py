@@ -1,6 +1,9 @@
 from datetime import datetime
 from app.db.database import get_connection
 
+# =====================================
+# Database Queries for Submissions & Tasks
+# =====================================
 
 def get_all_submissions():
     """
@@ -12,6 +15,7 @@ def get_all_submissions():
     connection = get_connection()
     cursor = connection.cursor()
 
+    # Fetch all submissions ordered by submission time (latest first)
     cursor.execute("""
         SELECT
             employee_id,
@@ -27,6 +31,7 @@ def get_all_submissions():
     rows = cursor.fetchall()
     connection.close()
 
+    # Convert rows to list of dictionaries
     return [dict(row) for row in rows]
 
 
@@ -40,6 +45,7 @@ def get_managers():
     connection = get_connection()
     cursor = connection.cursor()
 
+    # Fetch all managers ordered alphabetically
     cursor.execute("""
         SELECT name
         FROM managers
@@ -53,11 +59,15 @@ def get_managers():
 
 
 def get_latest_submissions(selected_date: str | None = None, manager: str | None = None):
+    """
+    Get the latest submissions per employee, optionally filtered by date and manager.
+    """
     connection = get_connection()
     cursor = connection.cursor()
 
     conditions, params = [], []
 
+    # Apply filters if provided
     if selected_date:
         conditions.append("DATE(submitted_at) = ?")
         params.append(selected_date)
@@ -87,9 +97,13 @@ def get_latest_submissions(selected_date: str | None = None, manager: str | None
 
 
 def get_employee_status_counts(selected_date: str | None = None, manager: str | None = None):
+    """
+    Count employees by status (idle vs production).
+    """
     connection = get_connection()
     cursor = connection.cursor()
 
+    # Filter by date if provided
     if selected_date:
         date_filter = "WHERE DATE(submitted_at) = ?"
         params = [selected_date]
@@ -110,9 +124,11 @@ def get_employee_status_counts(selected_date: str | None = None, manager: str | 
     cursor.execute(query, params)
     rows = cursor.fetchall()
 
+    # Apply manager filter if provided
     if manager and manager != "All":
         rows = [row for row in rows if row["manager"] == manager]
 
+    # Calculate counts
     total = len(rows)
     idle = sum(1 for row in rows if row["idle"] == 1)
     production = total - idle
@@ -123,11 +139,15 @@ def get_employee_status_counts(selected_date: str | None = None, manager: str | 
 
 
 def get_task_visibility(selected_date: str | None = None, manager: str | None = None):
+    """
+    Get visibility of tasks (how many employees are working on each task).
+    """
     connection = get_connection()
     cursor = connection.cursor()
 
     conditions, params = [], []
 
+    # Apply filters
     if selected_date:
         conditions.append("DATE(s.submitted_at) = ?")
         params.append(selected_date)
@@ -164,6 +184,9 @@ def get_task_visibility(selected_date: str | None = None, manager: str | None = 
 
 
 def get_employees_with_visible_task(task_id: str, manager: str | None = None):
+    """
+    Get employees currently visible on a specific task.
+    """
     connection = get_connection()
     cursor = connection.cursor()
 
@@ -204,6 +227,9 @@ def get_employees_with_visible_task(task_id: str, manager: str | None = None):
 
 
 def get_employee_visible_tasks(employee_id: str, manager: str | None = None):
+    """
+    Get all tasks visible for a specific employee.
+    """
     connection = get_connection()
     cursor = connection.cursor()
 
@@ -246,9 +272,13 @@ def get_employee_visible_tasks(employee_id: str, manager: str | None = None):
 
 
 def get_idle_employees(selected_date: str | None = None, manager: str | None = None):
+    """
+    Get employees marked as idle for a given date and manager.
+    """
     connection = get_connection()
     cursor = connection.cursor()
 
+    # Default to today's date if not provided
     if not selected_date:
         selected_date = datetime.now().strftime("%Y-%m-%d")
 
@@ -279,6 +309,50 @@ def get_idle_employees(selected_date: str | None = None, manager: str | None = N
         ) latest ON s.id = latest.latest_submission_id
         WHERE s.idle = 1
         ORDER BY s.submitted_at DESC
+    """
+
+    cursor.execute(query, params)
+    rows = cursor.fetchall()
+    connection.close()
+
+    return rows
+
+
+def get_task_status_report(selected_date=None, manager=None, task_status=None):
+    """
+    Get task status report for a given date, manager, and task status.
+    """
+    connection = get_connection()
+    cursor = connection.cursor()
+
+    # Default to today's date if not provided
+    if not selected_date:
+        selected_date = datetime.now().strftime("%Y-%m-%d")
+
+    query = """
+        SELECT
+            t.task_id,
+            COUNT(DISTINCT s.employee_id) AS employee_count
+        FROM tasks t
+        INNER JOIN submissions s ON t.submission_id = s.id
+        WHERE DATE(s.submitted_at) = ?
+    """
+
+    params = [selected_date]
+
+    # Manager filter
+    if manager and manager != "All":
+        query += " AND s.manager = ?"
+        params.append(manager)
+
+    # Task status filter
+    if task_status:
+        query += " AND t.jobs = ?"
+        params.append(task_status)
+
+    query += """
+        GROUP BY t.task_id
+        ORDER BY employee_count DESC
     """
 
     cursor.execute(query, params)
