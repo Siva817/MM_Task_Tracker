@@ -1,7 +1,19 @@
-.venv
-__pycache__
+# Virtual Environment
+.venv/
+
+# Python cache
+__pycache__/
 *.pyc
-.git
+
+# SQLite database
+*.db
+
+# Git
+.git/
 .gitignore
-.vscode
+
+# VS Code
+.vscode/
+
+# Environment variables
 .env
