@@ -8,7 +8,7 @@ from app.services.manager import (
     get_managers,
     get_employee_status_counts,
     get_task_visibility,
-    get_employee_visible_tasks,
+    get_tasks_visible_to_employee,
     get_employees_with_visible_task,
     get_idle_employees,
     get_task_status_report
@@ -72,14 +72,6 @@ async def manager_page(
         task_status
     )
 
-    # Debug print for idle employees
-    print("\n===== Task Status Report =====")
-
-    for task in task_status_report:
-        print(dict(task))
-
-    print("===== End Task Status Report =====\n")
-
     # Render template with context data
     return templates.TemplateResponse(
         request,
@@ -105,6 +97,7 @@ async def manager_lookup(
     employee_id: str | None = None,
     task_id: str | None = None,
     selected_manager: str | None = None,
+    selected_date: str | None = None,
 ):
     """
     Lookup endpoint.
@@ -113,9 +106,11 @@ async def manager_lookup(
 
     # Lookup by employee ID
     if lookup_type == "employee":
-        rows = get_employee_visible_tasks(
+        rows = get_tasks_visible_to_employee(
             employee_id,
             selected_manager,
+            
+            
         )
         return [
             {
@@ -136,6 +131,8 @@ async def manager_lookup(
         rows = get_employees_with_visible_task(
             task_id,
             selected_manager,
+            selected_date
+            
         )
         return [
             {

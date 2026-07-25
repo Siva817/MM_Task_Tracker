@@ -158,6 +158,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // Fetch Lookup Data
     lookupFetchButton.addEventListener("click", async function () {
         const selectedManager = managerFilter.value;
+        const selectedDate = dateFilter.value;
         const isEmployeeSearch = lookupEmployeeRadio.checked;
         let lookupValue;
 
@@ -172,6 +173,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const params = new URLSearchParams();
         params.append("lookup_type", isEmployeeSearch ? "employee" : "task");
         if (selectedManager !== "All") params.append("selected_manager", selectedManager);
+        if (selectedDate !== "") params.set("selected_date", selectedDate);
         if (isEmployeeSearch) params.append("employee_id", lookupValue);
         else params.append("task_id", lookupValue);
 

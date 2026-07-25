@@ -183,12 +183,24 @@ def get_task_visibility(selected_date: str | None = None, manager: str | None = 
     return rows
 
 
-def get_employees_with_visible_task(task_id: str, manager: str | None = None):
+def get_employees_with_visible_task(
+        task_id: str,
+        manager: str | None = None,
+        selected_date: str | None = None):
     """
     Get employees currently visible on a specific task.
     """
     connection = get_connection()
     cursor = connection.cursor()
+
+    # Default to today's date if not provided
+    if not selected_date:
+        selected_date = datetime.now().strftime("%Y-%m-%d")
+
+    print("===== TASK LOOKUP DEBUG =====")
+    print("Task ID:", task_id)
+    print("Manager:", manager)
+    print("Selected Date:", selected_date)
 
     query = """
         SELECT
@@ -203,11 +215,12 @@ def get_employees_with_visible_task(task_id: str, manager: str | None = None):
                 employee_id,
                 MAX(id) AS latest_submission_id
             FROM submissions
+            WHERE DATE(submitted_at) = ?
     """
 
-    params = []
+    params = [selected_date]
     if manager and manager != "All":
-        query += " WHERE manager = ?"
+        query += " AND manager = ?"
         params.append(manager)
 
     query += """
@@ -218,15 +231,24 @@ def get_employees_with_visible_task(task_id: str, manager: str | None = None):
     """
 
     params.append(task_id)
+
+    print("SQL Params:", params)
+
     cursor.execute(query, params)
 
     rows = cursor.fetchall()
+    
+    print("Rows Found:", len(rows))
+    print("============================")
+
+
+
     connection.close()
 
     return rows
 
 
-def get_employee_visible_tasks(employee_id: str, manager: str | None = None):
+def get_tasks_visible_to_employee(employee_id: str, manager: str | None = None):
     """
     Get all tasks visible for a specific employee.
     """
