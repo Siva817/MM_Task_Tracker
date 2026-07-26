@@ -402,3 +402,26 @@ tr:nth-child(even) {
 #idleEmployeesTable a:hover {
     text-decoration: underline;
 }
+
+/* Export CSV Buttons (smaller, secondary style) */
+#exportEmployeeCsvButton,
+#exportIdleEmployeesCsvButton,
+#exportLookupCsvButton,
+#exportTaskStatusCsvButton {
+  background-color: #666;
+  font-size: 12px;
+  padding: 6px 12px;
+  margin: 4px;
+  border-radius: 4px;
+  color: #fff;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+#exportEmployeeCsvButton:hover,
+#exportIdleEmployeesCsvButton:hover,
+#exportLookupCsvButton:hover,
+#exportTaskStatusCsvButton:hover {
+  background-color: #444;
+}
+

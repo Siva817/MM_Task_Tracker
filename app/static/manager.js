@@ -106,20 +106,31 @@ document.addEventListener("DOMContentLoaded", function () {
     const toggleTableButton = document.getElementById("toggleTableButton");
     const employeeTableContainer = document.getElementById("employeeTableContainer");
 
-    if (toggleTableButton && employeeTableContainer) {
-        toggleTableButton.addEventListener("click", function () {
-            employeeTableContainer.classList.toggle("hidden");
+    toggleTableButton.addEventListener("click", function () {
+        if (employeeTableContainer.style.display === "none") {
+            // Show table and export button
+            employeeTableContainer.style.display = "block";
+            exportEmployeeCsvButton.style.display = "inline-block";
 
-            const tableIsHidden = employeeTableContainer.classList.contains("hidden");
-            toggleTableButton.textContent = tableIsHidden ? "Show Employee Table" : "Hide Employee Table";
+            toggleTableButton.textContent = "Hide Employee Table";
 
-            if (!tableIsHidden) {
-                setTimeout(() => {
-                    employeeTableContainer.scrollIntoView({ behavior: "smooth", block: "start" });
-                }, 100);
-            }
-        });
-    }
+            // Scroll to table
+            setTimeout(() => {
+                employeeTableContainer.scrollIntoView({
+                    behavior: "smooth",
+                    block: "start"
+                });
+            }, 100);
+
+        } else {
+            // Hide table and export button
+            employeeTableContainer.style.display = "none";
+            exportEmployeeCsvButton.style.display = "none";
+
+            toggleTableButton.textContent = "Show Employee Table";
+        }
+    });
+
 
     /*
     ==================================================
@@ -252,9 +263,11 @@ document.addEventListener("DOMContentLoaded", function () {
     toggleIdleEmployeesButton.addEventListener("click", function () {
         if (idleEmployeesSection.style.display === "none") {
             idleEmployeesSection.style.display = "block";
+            exportIdleEmployeesCsvButton.style.display = "inline-block";
             toggleIdleEmployeesButton.textContent = "Hide Idle Employees";
         } else {
             idleEmployeesSection.style.display = "none";
+            exportIdleEmployeesCsvButton.style.display = "none";
             toggleIdleEmployeesButton.textContent = "Show Idle Employees";
         }
     });
@@ -332,6 +345,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 // Show table section
                 taskStatusTableSection.style.display = "block";
+                exportTaskStatusCsvButton.style.display = "inline-block";
 
                 // Smooth scroll to table
                 setTimeout(function () {
@@ -355,6 +369,7 @@ document.addEventListener("DOMContentLoaded", function () {
         hideTaskStatusButton.addEventListener("click", function () {
             // Hide the table section
             taskStatusTableSection.style.display = "none";
+            exportTaskStatusCsvButton.style.display = "none";
         });
     }
 

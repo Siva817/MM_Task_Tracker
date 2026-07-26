@@ -72,8 +72,9 @@
     <!-- ========================================
          EMPLOYEE TABLE TOGGLE
     ========================================= -->
+    <hr>
     <button id="toggleTableButton" type="button">Show Employee Table</button>
-    <button id="exportEmployeeCsvButton" type="button">Export Employee to CSV</button>
+    <button id="exportEmployeeCsvButton" type="button" style="display: none;">Export Employee to CSV</button>
 
     <!-- Employee Table -->
     <section id="employeeTableContainer" class="employee-table-container hidden">
@@ -100,9 +101,52 @@
         </table>
     </section>
 
+
+        <!-- ========================================
+         IDLE EMPLOYEES TABLE
+    ========================================= -->
+    <br><br> <hr>
+    <h2>Click below to fetch table of idle employees</h2>
+
+    <button id="toggleIdleEmployeesButton" type="button">Show Idle Employees</button>
+    <button id="exportIdleEmployeesCsvButton" type="button" style="display: none;">Export Idle Employees to CSV</button>
+
+    <div id="idleEmployeesSection" style="display: none;">
+        <h2>Idle Employees</h2>
+        <table id="idleEmployeesTable" border="1" cellpadding="6" cellspacing="0">
+            <thead>
+                <tr>
+                    <th>Employee ID</th>
+                    <th>Employee Name</th>
+                    <th>Manager</th>
+                    <th>Drive Link</th>
+                    <th>Remarks</th>
+                    <th>Last Log Time</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for employee in idle_employees %}
+                <tr>
+                    <td>{{ employee.employee_id }}</td>
+                    <td>{{ employee.employee_name.title() }}</td>
+                    <td>{{ employee.manager }}</td>
+                    <td>
+                        {% if employee.drive_link %}
+                        <a href="{{ employee.drive_link }}" target="_blank">Open Link</a>
+                        {% endif %}
+                    </td>
+                    <td>{{ employee.idle_remarks }}</td>
+                    <td>{{ employee.submitted_at }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
     <!-- ========================================
          TASK VISIBILITY LOOKUP
     ========================================= -->
+    <hr>
     <div id="taskLookupSection">
         <h2>Task Visibility Lookup</h2>
         <p>Search for the latest visible tasks of an employee or find employees who have a task visible.</p>
@@ -146,44 +190,7 @@
         </div>
     </div>
 
-    <!-- ========================================
-         IDLE EMPLOYEES TABLE
-    ========================================= -->
-    <br><br>
-    <button id="toggleIdleEmployeesButton" type="button">Show Idle Employees</button>
-    <button id="exportIdleEmployeesCsvButton" type="button">Export Idle Employees to CSV</button>
 
-    <div id="idleEmployeesSection" style="display: none;">
-        <h2>Idle Employees</h2>
-        <table id="idleEmployeesTable" border="1" cellpadding="6" cellspacing="0">
-            <thead>
-                <tr>
-                    <th>Employee ID</th>
-                    <th>Employee Name</th>
-                    <th>Manager</th>
-                    <th>Drive Link</th>
-                    <th>Remarks</th>
-                    <th>Last Log Time</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for employee in idle_employees %}
-                <tr>
-                    <td>{{ employee.employee_id }}</td>
-                    <td>{{ employee.employee_name.title() }}</td>
-                    <td>{{ employee.manager }}</td>
-                    <td>
-                        {% if employee.drive_link %}
-                        <a href="{{ employee.drive_link }}" target="_blank">Open Link</a>
-                        {% endif %}
-                    </td>
-                    <td>{{ employee.idle_remarks }}</td>
-                    <td>{{ employee.submitted_at }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
 
 
 <br><br>
@@ -191,6 +198,7 @@
     <!-- ===================================== -->
     <!-- Task Status Report -->
     <!-- ===================================== -->
+     <hr>
 
     <div id="taskStatusReportControls">
 
@@ -236,6 +244,7 @@
 
         <button
             id="exportTaskStatusCsvButton"
+            style="display: none;"
         >
             Export Task Status to CSV
         </button>
@@ -246,6 +255,7 @@
     <!-- ===================================== -->
     <!-- Task Status Table -->
     <!-- ===================================== -->
+     <hr>
 
     <div
         id="taskStatusTableSection"

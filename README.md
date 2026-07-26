@@ -197,7 +197,10 @@ Open the application:
 http://127.0.0.1:8000
 ```
 
-The Manager Dashboard is available through the application's manager route.
+The application provides the following pages:
+
+MM Task Tracker Employee Form: http://127.0.0.1:8000/employee/page
+Manager Dashboard: http://127.0.0.1:8000/manager
 
 ---
 
@@ -288,6 +291,10 @@ The application will be available at:
 ```text
 http://localhost:8000
 ```
+The application provides the following pages:
+
+MM Task Tracker Employee Form: http://localhost:8000/employee/page
+Manager Dashboard: http://localhost:8000/manager
 
 To stop the application:
 
@@ -459,4 +466,4 @@ Completed:
 
 ## Author
 
-Shiva Prasad
+Shiva Prasad Akamgari
