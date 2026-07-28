@@ -145,8 +145,14 @@ python -m venv .venv
 
 ### Windows
 
-```bash
+```cmd terminal
+
+.venv\Scripts\activate.bat
+Or
+
+bash
 source .venv/Scripts/activate
+
 ```
 
 ### Linux / macOS
@@ -200,6 +206,7 @@ http://127.0.0.1:8000
 The application provides the following pages:
 
 MM Task Tracker Employee Form: http://127.0.0.1:8000/employee/page
+
 Manager Dashboard: http://127.0.0.1:8000/manager
 
 ---

@@ -63,7 +63,7 @@ D:.
     │
     ├── static
     │   ├── manager.js
-    │   ├── script.js
+    │   ├── employee.js
     │   └── style.css
     │
     └── templates
@@ -1063,7 +1063,7 @@ Verify:
 
 ```text
 manager.js
-script.js
+employee.js
 style.css
 ```
 

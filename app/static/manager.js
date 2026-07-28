@@ -113,15 +113,7 @@ document.addEventListener("DOMContentLoaded", function () {
             exportEmployeeCsvButton.style.display = "inline-block";
 
             toggleTableButton.textContent = "Hide Employee Table";
-
-            // Scroll to table
-            setTimeout(() => {
-                employeeTableContainer.scrollIntoView({
-                    behavior: "smooth",
-                    block: "start"
-                });
-            }, 100);
-
+    
         } else {
             // Hide table and export button
             employeeTableContainer.style.display = "none";

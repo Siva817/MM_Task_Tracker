@@ -1491,7 +1491,7 @@ One submission can contain multiple tasks.
 employee.html
       │
       ▼
-script.js
+employee.js
       │
       │ POST /submit
       ▼

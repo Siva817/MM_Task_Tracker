@@ -221,14 +221,13 @@ tr:nth-child(even) {
 
 /* Table Toggle Button */
 #toggleTableButton {
-    display: block;
     margin: 30px auto;
     padding: 10px 20px;
     font-size: 15px;
     cursor: pointer;
     border: none;
     border-radius: 6px;
-    background-color: #333;
+    background-color: #4885cf;
     color: white;
 }
 

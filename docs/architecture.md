@@ -58,7 +58,7 @@ The application is designed as a layered web application:
                     │                         │
                     │ employee.html           │
                     │ manager.html            │
-                    │ script.js               │
+                    │ employee.js               │
                     │ manager.js              │
                     │ style.css               │
                     └────────────┬────────────┘
@@ -181,7 +181,7 @@ D:.
     │
     ├───static
     │       manager.js
-    │       script.js
+    │       employee.js
     │       style.css
     │
     └───templates
@@ -628,7 +628,7 @@ templates/
 └── manager.html
 
 static/
-├── script.js
+├── employee.js
 ├── manager.js
 └── style.css
 ```
@@ -650,7 +650,7 @@ The employee interface is responsible for:
 * Collecting submission data.
 * Sending data to backend APIs.
 
-### `static/script.js`
+### `static/employee.js`
 
 Contains employee-side JavaScript.
 
@@ -670,7 +670,7 @@ The employee frontend should communicate with the backend through APIs.
 employee.html
       │
       ▼
-script.js
+employee.js
       │
       │ HTTP Request
       ▼
