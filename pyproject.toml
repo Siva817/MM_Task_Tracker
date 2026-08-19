@@ -1,0 +1,15 @@
+[project]
+name = "mm-task-tracker"
+version = "1.0.0"
+description = "FastAPI application to track employee tasks and events"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi==0.139.2",
+    "uvicorn==0.51.0",
+    "jinja2==3.1.6",
+    "pydantic==2.13.4",
+    "mssql-python>=1.13.0",
+    "sqlalchemy>=2.0.52",
+    "pyodbc>=5.3.0",
+    "python-dotenv>=1.2.3",
+]

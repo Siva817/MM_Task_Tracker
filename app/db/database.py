@@ -1,19 +1,26 @@
-import sqlite3
+import os
 
-# Path to the SQLite database file
-DATABASE = "app/db/tracker.db"
+from dotenv import load_dotenv
+from sqlalchemy import create_engine
+from sqlalchemy.engine import URL
 
-def get_connection():
-    """
-    Establish and return a connection to the SQLite database.
-    The connection uses sqlite3.Row as the row factory so that
-    query results can be accessed like dictionaries (by column name).
-    """
-    # Create a connection to the database file
-    connection = sqlite3.connect(DATABASE)
+load_dotenv()
 
-    # Configure the connection to return rows as dictionary-like objects
-    connection.row_factory = sqlite3.Row
+SQL_SERVER = os.getenv("SQL_SERVER")
+SQL_DATABASE = os.getenv("SQL_DATABASE")
 
-    # Return the connection object to the caller
-    return connection
+connection_url = URL.create(
+    "mssql+pyodbc",
+    query={
+        "driver": "ODBC Driver 18 for SQL Server",
+        "server": SQL_SERVER,
+        "database": SQL_DATABASE,
+        "trusted_connection": "yes",
+        "TrustServerCertificate": "yes",
+    },
+)
+
+engine = create_engine(
+    connection_url,
+    pool_pre_ping=True,
+)
