@@ -4,6 +4,8 @@ from sqlalchemy import text
 
 from app.db.database import engine
 
+from app.services.data_cleanup import delete_old_data
+
 
 def save_submission(data):
     submitted_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -80,5 +82,5 @@ def save_submission(data):
                     "remarks": task["remarks"],
                 },
             )
-
+    delete_old_data()
     print(f"Submission saved with ID: {submission_id}")

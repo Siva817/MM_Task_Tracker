@@ -13,6 +13,10 @@ from app.services.manager import (
     get_idle_employees,
     get_task_status_report
 )
+from app.services.dashboard_cache import (
+    get_cached_dashboard,
+    set_cached_dashboard,
+)
 
 # Create router instance
 router = APIRouter()
@@ -29,67 +33,85 @@ async def manager_page(
 ):
     """
     Manager dashboard page.
-    Displays submissions, status counts, task visibility, and idle employees.
     """
 
-    # Fetch all submissions
+    task_status = request.query_params.get("task_status")
+
+    cache_key = (
+        selected_date or "",
+        selected_manager or "All",
+        task_status or "None",
+    )
+
+    cached_data = get_cached_dashboard(cache_key)
+
+    if cached_data is not None:
+        return templates.TemplateResponse(
+            request,
+            "manager.html",
+            {
+                "request": request,
+                **cached_data,
+            },
+        )
+
+    # Database queries only happen on cache miss
+
     submissions = get_all_submissions()
 
-    # Fetch latest submissions filtered by date/manager
     latest_submissions = get_latest_submissions(
         selected_date,
         selected_manager,
     )
 
-    # Fetch list of managers
     managers = get_managers()
 
-    # Get employee status counts (idle vs production)
     status_counts = get_employee_status_counts(
         selected_date,
         selected_manager,
     )
 
-    # Get task visibility data
     task_visibility = get_task_visibility(
         selected_date,
         selected_manager,
     )
 
-    # Get idle employees list
     idle_employees = get_idle_employees(
         selected_date,
         selected_manager,
     )
 
-    task_status = request.query_params.get(
-        "task_status"
-    )
-
     task_status_report = get_task_status_report(
         selected_date,
         selected_manager,
-        task_status
+        task_status,
     )
 
-    # Render template with context data
+    dashboard_data = {
+        "submissions": submissions,
+        "latest_submissions": latest_submissions,
+        "managers": managers,
+        "status_counts": status_counts,
+        "task_visibility": task_visibility,
+        "selected_date": selected_date,
+        "selected_manager": selected_manager,
+        "idle_employees": idle_employees,
+        "task_status_report": task_status_report,
+    }
+
+    set_cached_dashboard(
+        cache_key,
+        dashboard_data,
+    )
+
     return templates.TemplateResponse(
         request,
         "manager.html",
         {
             "request": request,
-            "submissions": submissions,
-            "latest_submissions": latest_submissions,
-            "managers": managers,
-            "status_counts": status_counts,
-            "task_visibility": task_visibility,
-            "selected_date": selected_date,
-            "selected_manager": selected_manager,
-            "idle_employees": idle_employees,
-            "task_status_report": task_status_report
+            **dashboard_data,
         },
     )
-
 
 @router.get("/lookup")
 async def manager_lookup(
