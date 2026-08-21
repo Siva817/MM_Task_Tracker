@@ -8,15 +8,18 @@ load_dotenv()
 
 SQL_SERVER = os.getenv("SQL_SERVER")
 SQL_DATABASE = os.getenv("SQL_DATABASE")
+SQL_USERNAME = os.getenv("SQL_USERNAME")
+SQL_PASSWORD = os.getenv("SQL_PASSWORD")
 
 connection_url = URL.create(
     "mssql+pyodbc",
+    username=SQL_USERNAME,
+    password=SQL_PASSWORD,
+    host=SQL_SERVER,
+    database=SQL_DATABASE,
     query={
         "driver": "ODBC Driver 18 for SQL Server",
-        "server": SQL_SERVER,
-        "database": SQL_DATABASE,
-        "trusted_connection": "yes",
-        "TrustServerCertificate": "yes",
+        "TrustServerCertificate": "no",
     },
 )
 
