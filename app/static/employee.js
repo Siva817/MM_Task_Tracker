@@ -5,6 +5,8 @@
 // Buttons
 const parseButton = document.getElementById("parseButton");
 const submitButton = document.getElementById("submitButton");
+const submitButtonText = document.getElementById("submitButtonText");
+const submitSpinner = document.getElementById("submitSpinner");
 
 // Dashboard input and task display
 const dashboard = document.getElementById("dashboard");
@@ -208,7 +210,6 @@ submitButton.addEventListener("click", async function () {
         return;
     }
 
-
     // Validate manager selection
     if (managerDropdown.value === "") {
         alert("Please select your manager.");
@@ -229,7 +230,7 @@ submitButton.addEventListener("click", async function () {
         });
     });
 
-    //Find the currently selected radio button with name="currentTask"
+    // Find the currently selected radio button with name="currentTask"
     const selectedTask = document.querySelector("input[name='currentTask']:checked");
 
     // If a task is selected, get its value; otherwise set currentTask to null
@@ -256,16 +257,41 @@ submitButton.addEventListener("click", async function () {
         tasks: taskData
     };
 
-    // Send data to server
-    const response = await fetch("/employee/submit", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(submission)
-    });
+    // Disable button immediately before sending the request
+    submitButton.disabled = true;
+    submitButton.textContent = "Submitting...";
+    submitSpinner.hidden = false;
 
-    const result = await response.json();
-    alert(result.message);
+    try {
+        // Send data to server
+        const response = await fetch("/employee/submit", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(submission)
+        });
+
+        const result = await response.json();
+
+        // Show existing success/error message
+        alert(result.message);
+
+        // Re-enable button after server response
+        submitButton.disabled = false;
+        submitButton.textContent = "Submit";
+        submitSpinner.hidden = true;
+
+    } catch (error) {
+        console.error("Submission error:", error);
+
+        alert("Unable to submit. Please try again.");
+
+        // Re-enable button if request failed
+        submitButton.disabled = false;
+        submitButton.textContent = "Submit";
+        submitSpinner.hidden = true;
+    }
 });
+
 
 // ===========================
 // Page Load Setup

@@ -40,10 +40,10 @@ async def submit_employee(request: Request):
     data = await request.json()
 
     # Debugging/logging output
-    print("\n====== Employee Submission ===")
-    save_submission(data)   # Save data using the service layer
-    print(data)
-    print("====== End Employee Submission ===\n")
+    # print("\n====== Employee Submission ===")
+    # save_submission(data)   # Save data using the service layer
+    # print(data)
+    # print("====== End Employee Submission ===\n")
 
     # Response back to client
     return {"message": "Data received successfully"}
