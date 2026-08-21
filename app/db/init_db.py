@@ -56,8 +56,11 @@ def initialize_database():
 
     cursor.executemany(
         """
-        INSERT OR IGNORE INTO managers(name)
-        VALUES (?)
+        INSERT INTO managers(name)
+        SELECT (?)
+        WHERE NOT EXISTS (
+                    SELECT 1 FROM managers WHERE name = ?
+                    )
         """,
         [(manager,) for manager in MANAGERS]
     )

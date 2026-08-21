@@ -49,12 +49,3 @@ CREATE TABLE tasks (
         FOREIGN KEY (submission_id)
         REFERENCES submissions(id)
 );
-
-
--- Managers
-INSERT INTO managers (name)
-VALUES
-    (N'Aamir Ahmad'),
-    (N'Aayushy Swetapragyan'),
-    (N'Abdul Noman Khan'),
-    (N'Abhijit M');
