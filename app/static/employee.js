@@ -79,6 +79,16 @@ function parseTasks(text) {
     const lines = text.split("\n");
     const tasks = [];
 
+    const ignoredValues = [
+        "Start",
+        "Audio",
+        "Image",
+        "Text",
+        "Video"
+    ];
+
+    const seenTaskIds = new Set();
+
     // Start from line 1 (skip header)
     for (let i = 1; i < lines.length; i++) {
         const currentLine = lines[i].trim();
@@ -86,15 +96,30 @@ function parseTasks(text) {
         // Skip non-task lines
         if (!isTaskId(currentLine)) continue;
 
+        // Skip duplicate task IDs
+        if (seenTaskIds.has(currentLine)) continue;
+
         // Find the nearest non-empty line above as task name
         let j = i - 1;
         while (j >= 0 && lines[j].trim() === "") j--;
 
         const taskName = lines[j].trim();
 
+        // Remove markdown formatting if needed
+        const cleanTaskName = taskName
+            .replace(/^\*\*(.*?)\*\*$/, "$1")
+            .replace(/^#+\s*/, "")
+            .trim();
+
+        // Skip ignored values
+        if (ignoredValues.includes(cleanTaskName)) continue;
+
+        // Remember task ID
+        seenTaskIds.add(currentLine);
+
         // Push task object
         tasks.push({
-            name: taskName,
+            name: cleanTaskName,
             id: currentLine,
             assessment: false,
             status: "Not Working"
