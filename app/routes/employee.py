@@ -1,13 +1,7 @@
 # FastAPI imports for routing, request handling, and responses
 from fastapi import APIRouter, Request
-from fastapi.responses import HTMLResponse, PlainTextResponse
+from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
-
-# Import Pydantic model for employee submissions
-from app.models.employee import EmployeeSubmission
-# Import service function to save submissions into the database
-from app.services.submission_service import save_submission
-
 from app.services.manager import get_managers
 
 # Create a router instance for employee-related endpoints
