@@ -3,7 +3,6 @@ from fastapi.responses import HTMLResponse
 from fastapi.responses import JSONResponse
 from fastapi.templating import Jinja2Templates
 from app.services.manager import (
-    get_all_submissions,
     get_latest_submissions,
     get_managers,
     get_employee_status_counts,
@@ -31,16 +30,9 @@ async def manager_page(
     selected_date: str | None = None,
     selected_manager: str | None = None,
 ):
-    """
-    Manager dashboard page.
-    """
-
-    task_status = request.query_params.get("task_status")
-
     cache_key = (
         selected_date or "",
         selected_manager or "All",
-        task_status or "None",
     )
 
     cached_data = get_cached_dashboard(cache_key)
@@ -54,10 +46,6 @@ async def manager_page(
                 **cached_data,
             },
         )
-
-    # Database queries only happen on cache miss
-
-    submissions = get_all_submissions()
 
     latest_submissions = get_latest_submissions(
         selected_date,
@@ -81,14 +69,7 @@ async def manager_page(
         selected_manager,
     )
 
-    task_status_report = get_task_status_report(
-        selected_date,
-        selected_manager,
-        task_status,
-    )
-
     dashboard_data = {
-        "submissions": submissions,
         "latest_submissions": latest_submissions,
         "managers": managers,
         "status_counts": status_counts,
@@ -96,7 +77,6 @@ async def manager_page(
         "selected_date": selected_date,
         "selected_manager": selected_manager,
         "idle_employees": idle_employees,
-        "task_status_report": task_status_report,
     }
 
     set_cached_dashboard(
