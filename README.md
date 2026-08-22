@@ -1,97 +1,54 @@
 # MM Task Tracker
 
-A FastAPI-based web application for tracking employee task status, idle events, and task-related information. Employee submissions are stored in a SQLite database and can be viewed and analyzed through the Manager Dashboard.
+FastAPI-based web application for tracking employee tasks, employee status, manager information, and task visibility.
 
-The application can be run in two ways:
-
-1. **Locally with Python and Uvicorn** — recommended for development
-2. **With Docker** — recommended for containerized deployment and testing
-
----
+The application provides separate employee and manager dashboards and uses SQL Server/Azure SQL for persistent data storage.
 
 ## Features
 
-### Employee Portal
+### Employee Dashboard
 
-* Submit employee ID and employee name
-* Employee IDs and employee names are normalized when saved
-* Select manager
-* Paste MM Dashboard data and automatically parse tasks
-* Select the current working task
-* Mark SWAY and MM clearance status
-* Record job availability:
-
-  * Not Checked
-  * Jobs Available
-  * Jobs Not Available
-  * Error / Can't Work
-* Add task remarks
-* Submit Idle events with:
-
-  * Drive file/folder link
-  * Idle remarks
+* Employee ID and employee name entry
+* Manager selection from the database
+* MM dashboard/task parsing
+* Task-level SWAY and MM status
+* Jobs and remarks
+* Idle status reporting
+* Drive link and idle remarks
+* Submission confirmation
+* Submit-button loading indicator to prevent duplicate submissions
 
 ### Manager Dashboard
 
-* View employee status summary:
+* Employee status summary
+* Idle vs Production chart
+* Task visibility chart
+* Manager filtering
+* Date filtering
+* Latest employee submission table
+* Idle employee table
+* Employee/task visibility lookup
+* Task status report
+* CSV export for dashboard tables
+* Timestamped CSV filenames for repeated downloads
 
-  * Idle employees
-  * Production employees
-  * Total employees
-* Idle vs Production doughnut chart
-* Task visibility employee count chart
-* Manager filter
-* Date filter
-* Employee current-task table
-* Task visibility lookup by:
+## Technology Stack
 
-  * Employee ID
-  * Task ID
-* Task status report:
-
-  * Not Checked
-  * Jobs Available
-  * Jobs Not Available
-  * Error / Can't Work
-* Idle employees table with:
-
-  * Employee ID
-  * Employee name
-  * Manager
-  * Drive link
-  * Idle remarks
-  * Last log time
-* Show/hide controls for dashboard tables
-* CSV export buttons for four Manager Dashboard tables
-
-### Backend
-
-* FastAPI REST API
-* SQLite database
-* Stores employee submissions
-* Stores parsed tasks linked to each submission
-* Automatic submission timestamp
-* Manager and date-based filtering
-* Task visibility reporting
-* Task status reporting
-* Idle employee reporting
-
----
-
-## Tech Stack
-
-* Python 3
-* FastAPI
-* Uvicorn
-* SQLite
-* HTML
-* CSS
-* JavaScript
-* Chart.js
-* Docker
-* Docker Compose
-
----
+| Component               | Technology                 |
+| ----------------------- | -------------------------- |
+| Backend                 | FastAPI                    |
+| Web server - local      | Uvicorn                    |
+| Web server - Azure      | Gunicorn + Uvicorn workers |
+| Template engine         | Jinja2                     |
+| Database                | SQL Server / Azure SQL     |
+| Database ORM/connection | SQLAlchemy                 |
+| SQL Server driver       | pyodbc                     |
+| Dependency management   | uv                         |
+| Configuration           | python-dotenv              |
+| Frontend                | HTML, CSS, JavaScript      |
+| Charts                  | Chart.js                   |
+| Deployment              | Azure App Service          |
+| CI/CD                   | GitHub Actions             |
 
 ## Project Structure
 
@@ -99,378 +56,383 @@ The application can be run in two ways:
 MM_Task_Tracker/
 │
 ├── app/
-│   ├── main.py
+│   ├── data/
+│   │   └── managers.py
+│   │
 │   ├── db/
 │   │   ├── database.py
-│   │   ├── init_db.py
-│   │   └── tracker.db
+│   │   └── ...
+│   │
 │   ├── models/
-│   ├── routes/
+│   │   └── employee.py
+│   │
+│   ├── routers/
+│   │   ├── employee.py
+│   │   └── manager.py
+│   │
 │   ├── services/
+│   │   ├── manager.py
+│   │   ├── submission_service.py
+│   │   └── dashboard_cache.py
+│   │
 │   ├── static/
-│   └── templates/
+│   │   ├── employee.js
+│   │   ├── manager.js
+│   │   └── style.css
+│   │
+│   ├── templates/
+│   │   ├── employee.html
+│   │   └── manager.html
+│   │
+│   └── main.py
 │
-├── docs/
-├── tests/
-├── Dockerfile
-├── docker-compose.yml
+├── .github/
+│   └── workflows/
+│       └── main_mm-task-tracker-test.yml
+│
+├── pyproject.toml
 ├── requirements.txt
+├── uv.lock
+├── .env
 └── README.md
 ```
 
----
+> The exact project structure may change as the application develops.
 
-# Installation
+## Requirements
 
-Clone the repository:
+* Python 3.12 or later
+* `uv`
+* SQL Server or Azure SQL Database
+* Microsoft ODBC Driver 18 for SQL Server
+* Git
 
-```bash
-git clone <repository-url>
-cd MM_Task_Tracker
+For Azure deployment, the App Service environment provides the Linux runtime used by Gunicorn.
+
+## Dependency Management with uv
+
+The project uses `uv` for dependency management.
+
+Install dependencies:
+
+```powershell
+uv sync
 ```
 
----
+Update the lock file after changing dependencies:
 
-# Option 1: Run Locally with Uvicorn
-
-Running with Uvicorn is recommended during development because code changes can be tested quickly with `--reload`.
-
-## 1. Create a Virtual Environment
-
-```bash
-python -m venv .venv
+```powershell
+uv lock
 ```
 
-## 2. Activate the Virtual Environment
+Run a Python command through the project environment:
 
-### Windows
-
-```cmd terminal
-
-.venv\Scripts\activate.bat
-Or
-
-bash
-source .venv/Scripts/activate
-
+```powershell
+uv run python --version
 ```
 
-### Linux / macOS
+The project keeps `uv.lock` under source control so dependency versions are reproducible.
 
-```bash
-source .venv/bin/activate
+## Local Development
+
+Start the FastAPI application locally with Uvicorn:
+
+```powershell
+uv run uvicorn app.main:app --reload
 ```
 
-## 3. Install Dependencies
-
-```bash
-pip install -r requirements.txt
-```
-
----
-
-## 4. Initialize the Database
-
-The application uses SQLite.
-
-The database file is located at:
-
-```text
-app/db/tracker.db
-```
-
-To initialize the database and create the required tables, run:
-
-```bash
-python -m app.db.init_db
-```
-
-If the database already exists and contains data, do not delete or recreate it unless you intentionally want to reset the database.
-
----
-
-## 5. Run the Application with Uvicorn
-
-Start the development server:
-
-```bash
-uvicorn app.main:app --reload
-```
-
-Open the application:
+The application will normally be available at:
 
 ```text
 http://127.0.0.1:8000
 ```
 
-The application provides the following pages:
-
-MM Task Tracker Employee Form: http://127.0.0.1:8000/employee/page
-
-Manager Dashboard: http://127.0.0.1:8000/manager
-
----
-
-## Option 2: Run with Docker
-
-Docker runs the application using the Python environment defined inside the Docker image.
-
-You do not need to activate the local `.venv` to run the Docker container.
-
-### Build the Docker Image
-
-From the project root:
-
-```bash
-docker build -t mm-task-tracker .
-```
-
-Check that the image was created:
-
-```bash
-docker images
-```
-
-You should see:
-
-```text
-mm-task-tracker
-```
-
-### Run the Docker Container
-
-The SQLite database is located at:
-
-```text
-app/db/tracker.db
-```
-
-To make sure database changes persist outside the Docker container, mount the local `app/db` directory into the container.
-
-### Git Bash
-
-```bash
-docker run -p 8000:8000 -v "$(pwd)/app/db:/app/app/db" mm-task-tracker
-```
-
-### PowerShell
-
-```powershell
-docker run -p 8000:8000 `
-    -v "${PWD}/app/db:/app/app/db" `
-    mm-task-tracker
-```
-
-The application will then be available at:
-
-```text
-http://localhost:8000
-```
-
-The database remains stored locally at:
-
-```text
-app/db/tracker.db
-```
-
-This means removing the Docker container does not remove the database stored on the host machine.
-
----
-
-# Option 3: Run with Docker Compose
-
-Docker Compose provides an easier way to build and run the application with the SQLite database volume configured automatically.
-
-The project contains:
-
-```text
-docker-compose.yml
-```
-
-Start the application:
-
-```bash
-docker compose up --build
-```
-
-The application will be available at:
-
-```text
-http://localhost:8000
-```
-The application provides the following pages:
-
-MM Task Tracker Employee Form: http://localhost:8000/employee/page
-Manager Dashboard: http://localhost:8000/manager
-
-To stop the application:
-
-```bash
-docker compose down
-```
-
-The SQLite database remains at:
-
-```text
-app/db/tracker.db
-```
-
-because the database directory is mounted as a Docker volume.
-
----
-
-# Choosing How to Run the Application
-
-## Development
-
-Use Uvicorn:
-
-```bash
-uvicorn app.main:app --reload
-```
-
-This is the recommended approach while actively developing the application.
-
-## Docker Testing or Deployment
-
-Use Docker:
-
-```bash
-docker compose up --build
-```
-
-This runs the application inside a container and uses the Docker configuration defined by the project.
-
----
-
-# Important: Do Not Run Both on Port 8000
-
-The Uvicorn and Docker versions cannot both use port `8000` at the same time.
-
-For example, if Uvicorn is running:
-
-```text
-http://localhost:8000
-```
-
-stop it before starting Docker.
-
-Stop Uvicorn with:
-
-```text
-Ctrl + C
-```
-
-Then start Docker.
-
-Alternatively, Docker can be mapped to another host port:
-
-```bash
-docker run -p 8001:8000 -v "$(pwd)/app/db:/app/app/db" mm-task-tracker
-```
-
-Then:
-
-```text
-Uvicorn → http://localhost:8000
-Docker  → http://localhost:8001
-```
-
-The first port is the host port, while the second port is the container port.
-
----
-
-# API Documentation
-
-FastAPI automatically generates interactive API documentation.
-
-Swagger UI:
+FastAPI documentation:
 
 ```text
 http://127.0.0.1:8000/docs
 ```
-
-ReDoc:
-
-```text
-http://127.0.0.1:8000/redoc
-```
-
-When running through Docker, the same endpoints are available through:
+Employee form submit page:
 
 ```text
-http://localhost:8000/docs
+http://127.0.0.1:8000/employee/page
 ```
-
-Application metadata:
-
-* **Title:** MM Task Tracker
-* **Description:** A FastAPI application to track employee tasks and events.
-* **Version:** 1.0.0
-
----
-
-# Database
-
-SQLite is used as the local database.
-
-Database file:
+Manager Dashboard:
 
 ```text
-app/db/tracker.db
+http://127.0.0.1:8000/manager
 ```
 
-Current tables include:
+## Environment Variables
 
+Create a `.env` file for local development.
+
+Example:
+
+```env
+SQL_SERVER=your-server.database.windows.net
+SQL_DATABASE=your-database
+SQL_USERNAME=your-username
+SQL_PASSWORD=your-password
+```
+
+Do not commit `.env` or database credentials to Git.
+
+The application uses:
+
+```python
+load_dotenv()
+```
+
+to load environment variables.
+
+## Database
+
+The application uses SQL Server/Azure SQL through SQLAlchemy and `pyodbc`.
+
+The SQLAlchemy connection uses:
+
+```text
+mssql+pyodbc
+```
+
+with:
+
+```text
+ODBC Driver 18 for SQL Server
+```
+
+The database currently contains tables including:
+
+* `managers`
 * `submissions`
 * `tasks`
 
-Each submission can contain multiple tasks through a foreign key relationship.
+The relationship between submissions and tasks is:
 
-The database is shared between the local Uvicorn and Docker workflows when Docker is run with the `app/db` volume mapping.
+```text
+submissions
+    │
+    │ 1
+    │
+    └──────────< tasks
+                 *
+```
 
----
+`tasks.submission_id` references `submissions.id`.
 
-# CSV Export
+## Manager Data
 
-The Manager Dashboard provides CSV export buttons for four dashboard tables.
+Manager names are maintained in:
 
-The exported CSV files contain the current table data displayed in the dashboard at the time of export.
+```text
+app/data/managers.py
+```
 
-CSV exports are generated from the table data currently available in the browser.
+The application seeds the manager list into the `managers` table.
 
----
+The manager dropdown on the employee page retrieves the manager list from the database.
 
-# Current Status
+## Running Locally
 
-Completed:
+Typical development workflow:
 
-* Employee submission page
-* Employee ID and employee name normalization
-* MM Dashboard task parser
-* Idle workflow
-* SQLite persistence
-* Task storage
-* Timestamp recording
-* Manager Dashboard
-* Manager filtering
-* Date filtering
-* Employee status summary cards
-* Idle vs Production doughnut chart
-* Task visibility chart
-* Current task employee table
-* Task visibility lookup
-* Task status report
-* Idle employees report
-* Show/hide dashboard tables
-* CSV export for four Manager Dashboard tables
-* Local Uvicorn execution
-* Docker support
-* Docker Compose support
-* Persistent SQLite database volume for Docker
+```powershell
+uv sync
+uv run uvicorn app.main:app --reload
+```
 
----
+Open:
 
-## Author
+```text
+http://127.0.0.1:8000
+```
 
-Shiva Prasad Akamgari
+## Production Deployment
+
+The application is deployed to Azure App Service.
+
+### Local development server
+
+Uvicorn is used during development:
+
+```text
+uv run uvicorn app.main:app --reload
+```
+
+### Azure production server
+
+Azure App Service uses Gunicorn with Uvicorn workers:
+
+```text
+gunicorn app.main:app -w 4 -k uvicorn.workers.UvicornWorker -b 0.0.0.0:8000
+```
+
+Explanation:
+
+* `app.main:app` — FastAPI application object
+* `-w 4` — starts four worker processes
+* `-k uvicorn.workers.UvicornWorker` — uses Uvicorn workers for the ASGI application
+* `-b 0.0.0.0:8000` — binds the application to port 8000
+
+Gunicorn is intended for the Linux Azure environment. It is not used as the local Windows development server.
+
+## Dependency Files
+
+The project maintains:
+
+### `pyproject.toml`
+
+Contains the project's dependency definitions and metadata.
+
+### `uv.lock`
+
+Contains the locked dependency versions used by `uv`.
+
+### `requirements.txt`
+
+Used by the Azure GitHub Actions deployment workflow:
+
+```text
+pip install -r requirements.txt
+```
+
+When dependencies change, update the lock file and regenerate the requirements file as needed.
+
+## CI/CD
+
+The project uses GitHub Actions for Azure deployment.
+
+The general deployment flow is:
+
+```text
+Git push
+   ↓
+GitHub Actions
+   ↓
+Azure authentication
+   ↓
+Install Python dependencies
+   ↓
+Deploy application
+   ↓
+Azure App Service
+```
+
+The GitHub Actions workflow is located under:
+
+```text
+.github/workflows/
+```
+
+## Important Production Dependencies
+
+The project uses:
+
+```text
+FastAPI
+Uvicorn
+Gunicorn
+SQLAlchemy
+pyodbc
+Jinja2
+Pydantic
+python-dotenv
+```
+
+`mssql-python` is not used by the current SQL Server connection.
+
+The application connects through:
+
+```text
+SQLAlchemy → pyodbc → ODBC Driver 18 → SQL Server/Azure SQL
+```
+
+## Security
+
+Never commit:
+
+* `.env`
+* Database passwords
+* Access tokens
+* Refresh tokens
+* Client secrets
+* Azure credentials
+
+Use environment variables or Azure App Service configuration for production secrets.
+
+## Development Notes
+
+### Uvicorn vs Gunicorn
+
+Uvicorn is convenient for local development:
+
+```text
+uvicorn app.main:app --reload
+```
+
+Gunicorn is used for the Azure production environment:
+
+```text
+gunicorn app.main:app -w 4 -k uvicorn.workers.UvicornWorker -b 0.0.0.0:8000
+```
+
+Gunicorn should not be tested directly on Windows because it depends on Unix-specific functionality such as Python's `fcntl` module.
+
+## Current Architecture
+
+```text
+                    ┌─────────────────────┐
+                    │    Employee User    │
+                    └──────────┬──────────┘
+                               │
+                               ▼
+                    ┌─────────────────────┐
+                    │      FastAPI        │
+                    │                     │
+                    │ Employee / Manager  │
+                    │      Routers        │
+                    └──────────┬──────────┘
+                               │
+              ┌────────────────┴────────────────┐
+              │                                 │
+              ▼                                 ▼
+      ┌─────────────────┐              ┌─────────────────┐
+      │     Services    │              │     Jinja2      │
+      │                 │              │    Templates    │
+      └────────┬────────┘              └─────────────────┘
+               │
+               ▼
+      ┌─────────────────┐
+      │    SQLAlchemy   │
+      └────────┬────────┘
+               │
+               ▼
+      ┌─────────────────┐
+      │     pyodbc      │
+      └────────┬────────┘
+               │
+               ▼
+      ┌─────────────────┐
+      │ SQL Server /    │
+      │    Azure SQL    │
+      └─────────────────┘
+```
+
+## Future Improvements
+
+Potential future improvements include:
+
+* Further optimization of Manager Dashboard database queries
+* Server-side pagination for large employee tables
+* Lazy loading of employee and idle tables
+* Improved dashboard caching
+* Database indexing optimization
+* Gunicorn worker tuning based on Azure App Service resources
+* More comprehensive application logging
+* Automated tests
+* Improved error handling and user notifications
+
+## License
+
+Internal project.
