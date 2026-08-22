@@ -5,8 +5,6 @@
 // Buttons
 const parseButton = document.getElementById("parseButton");
 const submitButton = document.getElementById("submitButton");
-const submitButtonText = document.getElementById("submitButtonText");
-const submitSpinner = document.getElementById("submitSpinner");
 
 // Dashboard input and task display
 const dashboard = document.getElementById("dashboard");
@@ -193,7 +191,6 @@ parseButton.addEventListener("click", function () {
 // ===========================
 // Submit Button Click Handler
 // ===========================
-
 submitButton.addEventListener("click", async function () {
 
     // Validate Employee ID
@@ -230,19 +227,21 @@ submitButton.addEventListener("click", async function () {
         });
     });
 
-    // Find the currently selected radio button with name="currentTask"
-    const selectedTask = document.querySelector("input[name='currentTask']:checked");
+    // Find the currently selected radio button
+    const selectedTask = document.querySelector(
+        "input[name='currentTask']:checked"
+    );
 
-    // If a task is selected, get its value; otherwise set currentTask to null
+    // Get selected task value
     const currentTask = selectedTask ? selectedTask.value : null;
 
-    // If no task is selected, alert the user and stop execution
+    // Validate current task
     if (currentTask === null) {
         alert("Please select your current task or choose 'Idle'.");
         return;
     }
 
-    // Check if the selected task is "idle"
+    // Check if selected task is idle
     const idle = currentTask === "idle";
 
     // Build submission object
@@ -257,16 +256,17 @@ submitButton.addEventListener("click", async function () {
         tasks: taskData
     };
 
-    // Disable button immediately before sending the request
+    // Start loading state
+    submitButton.classList.add("is-loading");
     submitButton.disabled = true;
-    submitButton.textContent = "Submitting...";
-    submitSpinner.hidden = false;
 
     try {
         // Send data to server
         const response = await fetch("/employee/submit", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+                "Content-Type": "application/json"
+            },
             body: JSON.stringify(submission)
         });
 
@@ -275,20 +275,15 @@ submitButton.addEventListener("click", async function () {
         // Show existing success/error message
         alert(result.message);
 
-        // Re-enable button after server response
-        submitButton.disabled = false;
-        submitButton.textContent = "Submit";
-        submitSpinner.hidden = true;
-
     } catch (error) {
         console.error("Submission error:", error);
 
         alert("Unable to submit. Please try again.");
 
-        // Re-enable button if request failed
+    } finally {
+        // Stop loading state
+        submitButton.classList.remove("is-loading");
         submitButton.disabled = false;
-        submitButton.textContent = "Submit";
-        submitSpinner.hidden = true;
     }
 });
 

@@ -123,27 +123,40 @@ tr:nth-child(even) {
 }
 
 
+/* Submit Button */
+.submit-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+/* Spinner - hidden by default */
 .submit-spinner {
-    display: inline-block;
+    display: none;
     width: 14px;
     height: 14px;
-    margin-left: 8px;
     border: 2px solid currentColor;
     border-right-color: transparent;
     border-radius: 50%;
     animation: submit-spin 0.7s linear infinite;
-    vertical-align: middle;
+}
+
+/* Show spinner while submitting */
+.submit-btn.is-loading .submit-spinner {
+    display: inline-block;
+}
+
+/* Loading state */
+.submit-btn.is-loading {
+    cursor: not-allowed;
+    opacity: 0.7;
 }
 
 @keyframes submit-spin {
     to {
         transform: rotate(360deg);
     }
-}
-
-#submitButton:disabled {
-    cursor: not-allowed;
-    opacity: 0.7;
 }
 
 /* ========================================
