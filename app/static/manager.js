@@ -415,10 +415,21 @@ document.addEventListener("DOMContentLoaded", function () {
         // Create a temporary URL for the Blob
         const url = URL.createObjectURL(blob);
 
+        // Create timestamp
+        const now = new Date();
+        
+        const timestamp =
+            now.getFullYear() + "-" +
+            String(now.getMonth() + 1).padStart(2, "0") + "-" +
+            String(now.getDate()).padStart(2, "0") + "_" +
+            String(now.getHours()).padStart(2, "0") + "-" +
+            String(now.getMinutes()).padStart(2, "0") + "-" +
+            String(now.getSeconds()).padStart(2, "0");
+            
         // Create a temporary <a> element for download
         const link = document.createElement("a");
         link.href = url;
-        link.download = filename;
+        link.download = filename.replace(".csv", "") + "_" + timestamp + ".csv";
 
         // Append link to document, trigger click, then remove it
         document.body.appendChild(link);
