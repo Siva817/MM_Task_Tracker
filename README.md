@@ -172,6 +172,7 @@ Example:
 ```env
 SQL_SERVER=your-server.database.windows.net
 SQL_DATABASE=your-database
+DATA_RETENTION_DAYS=7
 SQL_USERNAME=your-username
 SQL_PASSWORD=your-password
 ```
