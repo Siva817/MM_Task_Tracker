@@ -42,3 +42,7 @@ def home():
     Returns a simple JSON welcome message.
     """
     return {"message": "Welcome to MM Task Tracker!"}
+
+@app.get("/health")
+def health():
+    return {"status": "healthy"}

@@ -63,12 +63,15 @@ function isTaskId(line) {
     if (line === "") return false;
 
     // Task IDs are either:
-    // 1. Start with "vs-"
-    // 2. Start with digits (e.g., 260210-...)
-    if (line.startsWith("vs-")) return true;
-    if (/^\d/.test(line)) return true;
+    // 1. Numeric format: 6 digits + "-" + task name
+    // 2. VS format: "vs-" + digits + "-" + task name
+    const numericTaskId =
+        /^\d{6}-[a-z0-9]+(?:-[a-z0-9]+)*$/i;
 
-    return false;
+    const vsTaskId =
+        /^vs-\d+-[a-z0-9]+(?:-[a-z0-9]+)*$/i;
+
+    return numericTaskId.test(line) || vsTaskId.test(line);
 }
 
 // ===========================
