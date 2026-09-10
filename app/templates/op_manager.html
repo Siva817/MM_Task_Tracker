@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>OP Manager</title>
+
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+
+    <h1>OP Manager</h1>
+
+    <div class="op-manager-controls">
+        <div class="op-manager-date">
+            <label for="selected-date">Date:</label>
+            <input
+                type="date"
+                id="selected-date"
+                value="{{ selected_date or '' }}"
+            >
+        </div>
+
+        <button onclick="applyDate()">Apply</button>
+
+        <button onclick="exportCSV()">Export CSV</button>
+    </div>
+
+
+    <h2>Manager Performance</h2>
+
+    <div class="op-manager-table-container">
+        <table id="manager-table">
+
+            <thead>
+                <tr>
+                    <th><button class="sort-button" data-column="0" data-type="text">Manager</button></th>
+                    <th>Performance</th>
+                    <th><button class="sort-button" data-column="2" data-type="number">Idle</button></th>
+                    <th><button class="sort-button" data-column="3" data-type="number">Production</button></th>
+                    <th><button class="sort-button" data-column="4" data-type="number">Total</button></th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for manager in managers %}
+
+                <tr>
+
+                    <td>
+                        <a
+                            href="/manager?selected_manager={{ manager.manager | urlencode }}&selected_date={{ selected_date or '' }}"
+                            target="_blank"
+                        >
+                            {{ manager.manager }}
+                        </a>
+                    </td>
+
+                    <td>
+                        <canvas
+                            class="manager-chart"
+                            data-idle="{{ manager.idle }}"
+                            data-production="{{ manager.production }}"
+                            width="50"
+                            height="50"
+                        ></canvas>
+                    </td>
+
+                    <td>{{ manager.idle }}</td>
+
+                    <td>{{ manager.production }}</td>
+
+                    <td>{{ manager.total }}</td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+    </div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/static/op_manager.js"></script>
+
+</body>
+</html>

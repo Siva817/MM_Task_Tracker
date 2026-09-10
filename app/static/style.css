@@ -461,3 +461,112 @@ tr:nth-child(even) {
   background-color: #444;
 }
 
+/* OP Manager responsive layout */
+
+.op-manager-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 20px 0 30px 0;
+}
+
+.op-manager-date {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.op-manager-controls input[type="date"] {
+    padding: 8px 12px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.op-manager-controls button {
+    padding: 8px 16px;
+    font-size: 14px;
+    border: none;
+    border-radius: 5px;
+    background-color: #0078d7;
+    color: #fff;
+    cursor: pointer;
+}
+
+.op-manager-table-container {
+    width: 100%;
+    overflow-x: auto;
+}
+
+#manager-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#manager-table th,
+#manager-table td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+#manager-table th {
+    background-color: #f5f5f5;
+}
+
+#manager-table th:nth-child(2),
+#manager-table td:nth-child(2) {
+    width: 90px;
+    min-width: 90px;
+    max-width: 90px;
+    text-align: center;
+}
+
+.sort-button {
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    font: inherit;
+    font-weight: bold;
+    color: inherit;
+    cursor: pointer;
+}
+
+.sort-button:hover {
+    text-decoration: underline;
+}
+
+
+/* Narrow window */
+
+@media (max-width: 600px) {
+
+    .op-manager-controls {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+
+    .op-manager-date {
+        width: 100%;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 5px;
+    }
+
+    .op-manager-controls input[type="date"],
+    .op-manager-controls button {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .op-manager-table-container {
+        overflow-x: auto;
+    }
+
+    #manager-table {
+        min-width: 600px;
+    }
+
+}

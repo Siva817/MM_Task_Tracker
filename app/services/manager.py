@@ -346,3 +346,38 @@ def get_task_status_report(
         result = connection.execute(query, params)
 
         return result.mappings().all()
+
+def get_op_manager_summary(selected_date: str | None = None):
+    if not selected_date:
+        selected_date = datetime.now().strftime("%Y-%m-%d")
+
+    params = {"selected_date": selected_date}
+
+    query = text("""
+        SELECT
+            manager,
+            COUNT(*) AS total,
+            SUM(CASE WHEN idle = 1 THEN 1 ELSE 0 END) AS idle
+        FROM submissions
+        WHERE id IN (
+            SELECT MAX(id)
+            FROM submissions
+            WHERE CAST(submitted_at AS DATE) = :selected_date
+            GROUP BY employee_id
+        )
+        GROUP BY manager
+        ORDER BY manager
+    """)
+
+    with engine.connect() as connection:
+        rows = connection.execute(query, params).mappings().all()
+
+    return [
+        {
+            "manager": row["manager"],
+            "idle": row["idle"] or 0,
+            "production": (row["total"] or 0) - (row["idle"] or 0),
+            "total": row["total"] or 0,
+        }
+        for row in rows
+    ]
