@@ -3,6 +3,7 @@ from fastapi import APIRouter, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from app.services.manager import get_managers
+from app.services.submission_service import save_submission
 
 # Create a router instance for employee-related endpoints
 router = APIRouter()
@@ -35,7 +36,7 @@ async def submit_employee(request: Request):
 
     # Debugging/logging output
     # print("\n====== Employee Submission ===")
-    # save_submission(data)   # Save data using the service layer
+    save_submission(data)   # Save data using the service layer
     # print(data)
     # print("====== End Employee Submission ===\n")
 
