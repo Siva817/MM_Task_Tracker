@@ -83,6 +83,7 @@
             <caption>Latest Employee Submissions</caption>
             <thead>
                 <tr>
+                    <th>Employee ID</th>
                     <th>Employee</th>
                     <th>Manager</th>
                     <th>Current Task</th>
@@ -92,6 +93,7 @@
             <tbody>
                 {% for submission in latest_submissions %}
                 <tr data-manager="{{ submission.manager }}">
+                    <td>{{ submission.employee_id }}</td>
                     <td>{{ submission.employee_name.title() }}</td>
                     <td>{{ submission.manager }}</td>
                     <td>{{ submission.current_task }}</td>

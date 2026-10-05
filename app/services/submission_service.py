@@ -1,4 +1,5 @@
 from datetime import datetime
+from zoneinfo import ZoneInfo
 
 from sqlalchemy import text
 
@@ -8,7 +9,7 @@ from app.db.database import engine
 
 
 def save_submission(data):
-    submitted_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    submitted_at = datetime.now(ZoneInfo("Asia/Kolkata")).strftime("%Y-%m-%d %H:%M:%S")
 
     with engine.begin() as connection:
 

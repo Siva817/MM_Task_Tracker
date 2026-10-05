@@ -42,28 +42,72 @@ document.addEventListener("DOMContentLoaded", function () {
     const taskChartElement = document.getElementById("taskVisibilityChart");
 
     if (taskChartElement) {
-        const taskLabels = taskVisibility.map(task => task.taskId);
-        const employeeCounts = taskVisibility.map(task => task.employeeCount);
+        const taskContainer = taskChartElement.parentElement;
 
-        new Chart(taskChartElement, {
-            type: "bar",
-            data: {
-                labels: taskLabels,
-                datasets: [{ label: "Employees", data: employeeCounts }],
-            },
-            options: {
-                indexAxis: "y",
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false },
-                    title: { display: true, text: "Task Visibility" },
-                },
-                scales: {
-                    x: { beginAtZero: true, ticks: { stepSize: 1 } },
-                },
-            },
-        });
+        // Remove the canvas because we are creating an Excel-style data bar
+        taskChartElement.remove();
+
+        const taskVisibilityContainer = document.createElement("div");
+        taskVisibilityContainer.className = "task-visibility-container";
+
+        const title = document.createElement("h3");
+        title.textContent = "Task Visibility";
+        title.className = "task-visibility-title";
+
+        taskVisibilityContainer.appendChild(title);
+
+        if (!taskVisibility || taskVisibility.length === 0) {
+            const emptyMessage = document.createElement("p");
+            emptyMessage.textContent = "No task visibility data available.";
+            emptyMessage.className = "task-visibility-empty";
+            taskVisibilityContainer.appendChild(emptyMessage);
+        } else {
+            // Find the highest employee count.
+            // This becomes 100% of the data bar.
+            const maxCount = Math.max(
+                ...taskVisibility.map(task => Number(task.employeeCount) || 0)
+            );
+
+            const taskList = document.createElement("div");
+            taskList.className = "task-visibility-list";
+
+            taskVisibility.forEach(task => {
+                const count = Number(task.employeeCount) || 0;
+
+                const row = document.createElement("div");
+                row.className = "task-visibility-row";
+
+                // Calculate how much of the row should be filled.
+                const percentage = maxCount > 0
+                    ? (count / maxCount) * 100
+                    : 0;
+
+                // Data-bar background
+                const dataBar = document.createElement("div");
+                dataBar.className = "task-visibility-bar";
+                dataBar.style.width = `${percentage}%`;
+
+                // Task ID
+                const taskName = document.createElement("span");
+                taskName.className = "task-visibility-name";
+                taskName.textContent = task.taskId;
+
+                // Employee count
+                const employeeCount = document.createElement("span");
+                employeeCount.className = "task-visibility-count";
+                employeeCount.textContent = count;
+
+                row.appendChild(dataBar);
+                row.appendChild(taskName);
+                row.appendChild(employeeCount);
+
+                taskList.appendChild(row);
+            });
+
+            taskVisibilityContainer.appendChild(taskList);
+        }
+
+        taskContainer.appendChild(taskVisibilityContainer);
     }
 
     /*

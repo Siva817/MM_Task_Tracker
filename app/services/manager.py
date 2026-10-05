@@ -65,7 +65,7 @@ def get_latest_submissions(
             {where}
             GROUP BY employee_id
         )
-        ORDER BY employee_name
+        ORDER BY submitted_at DESC
     """)
 
     with engine.connect() as connection:
